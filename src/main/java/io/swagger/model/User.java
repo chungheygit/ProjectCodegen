@@ -17,7 +17,7 @@ import javax.validation.constraints.*;
  * User
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-13T11:41:43.884Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
 
 public class User   {
@@ -78,6 +78,9 @@ public class User   {
 
   @JsonProperty("transactionLimit")
   private BigDecimal transactionLimit = null;
+
+  @JsonProperty("open")
+  private Boolean open = null;
 
   public User id(Long id) {
     this.id = id;
@@ -269,6 +272,26 @@ public class User   {
     this.transactionLimit = transactionLimit;
   }
 
+  public User open(Boolean open) {
+    this.open = open;
+    return this;
+  }
+
+  /**
+   * Get open
+   * @return open
+   **/
+  @Schema(example = "false", required = true, description = "")
+      @NotNull
+
+    public Boolean isOpen() {
+    return open;
+  }
+
+  public void setOpen(Boolean open) {
+    this.open = open;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -287,12 +310,13 @@ public class User   {
         Objects.equals(this.password, user.password) &&
         Objects.equals(this.userType, user.userType) &&
         Objects.equals(this.dayLimit, user.dayLimit) &&
-        Objects.equals(this.transactionLimit, user.transactionLimit);
+        Objects.equals(this.transactionLimit, user.transactionLimit) &&
+        Objects.equals(this.open, user.open);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, firstName, lastName, dateOfBirth, email, password, userType, dayLimit, transactionLimit);
+    return Objects.hash(id, firstName, lastName, dateOfBirth, email, password, userType, dayLimit, transactionLimit, open);
   }
 
   @Override
@@ -309,6 +333,7 @@ public class User   {
     sb.append("    userType: ").append(toIndentedString(userType)).append("\n");
     sb.append("    dayLimit: ").append(toIndentedString(dayLimit)).append("\n");
     sb.append("    transactionLimit: ").append(toIndentedString(transactionLimit)).append("\n");
+    sb.append("    open: ").append(toIndentedString(open)).append("\n");
     sb.append("}");
     return sb.toString();
   }
