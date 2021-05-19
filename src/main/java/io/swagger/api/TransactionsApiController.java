@@ -1,5 +1,6 @@
 package io.swagger.api;
 
+import io.swagger.service.TransactionService;
 import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
@@ -44,17 +45,20 @@ public class TransactionsApiController implements TransactionsApi {
 
     private final HttpServletRequest request;
 
+    private TransactionService service;
+
     @org.springframework.beans.factory.annotation.Autowired
-    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request) {
+    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service) {
         this.objectMapper = objectMapper;
         this.request = request;
+        this.service = service;
     }
 
     public ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Transaction body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<Transaction>(objectMapper.readValue("{\n  \"amount\" : 0.15658129805029453,\n  \"userPerforming\" : 6,\n  \"receiver\" : \"receiver\",\n  \"sender\" : \"sender\",\n  \"description\" : \"description\",\n  \"id\" : 0,\n  \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\"\n}", Transaction.class), HttpStatus.NOT_IMPLEMENTED);
+                return new ResponseEntity<Transaction>(service.createTransaction(body),	HttpStatus.CREATED);
             } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Transaction>(HttpStatus.INTERNAL_SERVER_ERROR);
