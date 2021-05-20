@@ -7,17 +7,22 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
  * Transaction
  */
+@Entity
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
 
 public class Transaction   {
+  @Id
   @JsonProperty("id")
   private Integer id = null;
 

@@ -59,7 +59,7 @@ public class TransactionsApiController implements TransactionsApi {
         if (accept != null && accept.contains("application/json")) {
             try {
                 return new ResponseEntity<Transaction>(service.createTransaction(body),	HttpStatus.CREATED);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Transaction>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
