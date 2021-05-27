@@ -3,6 +3,7 @@ package io.swagger.service;
 import io.swagger.model.Account;
 import io.swagger.repository.AccountRepository;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,9 @@ public class AccountService {
     }
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
+    }
+    public Account findAccountByCreatedDate(LocalDate date){
+        return accountRepository.findAccountByCreatedDate(date);
     }
     public void updateAccount(Account account){
         accountRepository.save(account);
