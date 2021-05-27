@@ -30,7 +30,7 @@ public class TransactionService {
 
         if(sender.getAccountType() == Account.AccountTypeEnum.SAVINGS || receiver.getAccountType() == Account.AccountTypeEnum.SAVINGS)
         {
-            if(sender.getUserId() != receiver.getUserId()){
+            if(!sender.getUserId().equals(receiver.getUserId())){
                 throw new Exception("Forbidden to transfer from/to savings account from another user.");
             }
             else{
@@ -42,6 +42,8 @@ public class TransactionService {
                 }
             }
         }
+        //check limits
+
         transaction.setTimestamp(OffsetDateTime.now());
         //userPerforming
         accountService.addToBalance(receiver, transaction.getAmount());

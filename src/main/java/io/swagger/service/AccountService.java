@@ -50,18 +50,17 @@ public class AccountService {
      //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
    // }
     public Account getAccountByIban(String iban) throws Exception {
-        if(getAccountByIban(iban)==null){
-            throw new Exception("Account does not exist");
-        }
-        return getAccountByIban(iban);
+        return accountRepository.getAccountByIban(iban);
     }
 
     protected void addToBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
     }
 
     protected void subtractFromBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
     }
 }
 
