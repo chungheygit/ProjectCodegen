@@ -4,6 +4,7 @@ import io.swagger.model.Account;
 import io.swagger.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,9 +45,19 @@ public class AccountService {
    // public Boolean ibanExists(String IBAN){
      //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
    // }
- // public Account GetAccountByIban(String accountNumber)
-  //{
-   //   return accountRepository.findById(accountNumber).get();
-  //}
+    public Account getAccountByIban(String iban) throws Exception {
+        if(getAccountByIban(iban)==null){
+            throw new Exception("Account does not exist");
+        }
+        return getAccountByIban(iban);
+    }
+
+    protected void addToBalance(Account account, BigDecimal amount){
+
+    }
+
+    protected void subtractFromBalance(Account account, BigDecimal amount){
+
+    }
 }
 

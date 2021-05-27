@@ -9,6 +9,7 @@ import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -23,6 +24,7 @@ import javax.validation.constraints.*;
 
 public class Transaction   {
   @Id
+  @GeneratedValue
   @JsonProperty("id")
   private Integer id = null;
 

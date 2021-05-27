@@ -23,10 +23,10 @@ import javax.validation.constraints.*;
 
 
 public class Account   {
-  @Id
   @JsonProperty("userId")
   private Long userId = null;
 
+  @Id
   @JsonProperty("iban")
   private String iban = null;
 
