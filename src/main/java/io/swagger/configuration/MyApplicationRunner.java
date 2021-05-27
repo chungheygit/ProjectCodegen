@@ -4,6 +4,7 @@ import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import io.swagger.model.Account;
+import io.swagger.model.User;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
 
