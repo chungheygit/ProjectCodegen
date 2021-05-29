@@ -57,12 +57,6 @@ public class AccountService {
         return  accountRepository.save(account);
 
     }
-    public Account getAccountByIban(String iban) throws Exception {
-        if(getAccountByIban(iban)==null){
-            throw new Exception("Account does not exist");
-        }
-        return getAccountByIban(iban);
-    }
 
     public Account createAccount(Account account){
          return accountRepository.save(account);
@@ -85,6 +79,9 @@ public class AccountService {
    // }
     
     public Account getAccountByIban(String iban) throws Exception {
+        if(accountRepository.getAccountByIban(iban)==null){
+            throw new Exception("Account does not exist");
+        }
         return accountRepository.getAccountByIban(iban);
     }
 

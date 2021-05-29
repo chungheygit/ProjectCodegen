@@ -59,8 +59,8 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<Account>(objectMapper.readValue("{\n  \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\",\n  \"balance\" : 6.027456183070403,\n  \"absoluteLimit\" : 1.4658129805029452,\n  \"iban\" : \"iban\",\n  \"accountType\" : \"current\",\n  \"userId\" : 1,\n  \"open\" : false\n}", Account.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                return new ResponseEntity<Account>(accountService.getAccountByIban(iban), HttpStatus.OK);
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Account>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
