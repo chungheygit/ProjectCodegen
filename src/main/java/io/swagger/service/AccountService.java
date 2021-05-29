@@ -83,14 +83,19 @@ public class AccountService {
    // public Boolean ibanExists(String IBAN){
      //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
    // }
-
+    
+    public Account getAccountByIban(String iban) throws Exception {
+        return accountRepository.getAccountByIban(iban);
+    }
 
     protected void addToBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
     }
 
     protected void subtractFromBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
     }
 }
 
