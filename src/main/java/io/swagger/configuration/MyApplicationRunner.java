@@ -2,8 +2,11 @@ package io.swagger.configuration;
 
 import io.swagger.model.Account;
 import io.swagger.model.User;
+import io.swagger.repository.AccountRepository;
+import io.swagger.repository.TransactionRepository;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -14,14 +17,18 @@ import java.math.BigDecimal;
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
 
-
     private UserService userService;
 
     private AccountService accountService;
 
-    public MyApplicationRunner(UserService userService ,AccountService accountService) {
+    //Add all repositories here and in constructor (or @Autowired)
+
+    private AccountRepository accountRepository;
+
+    public MyApplicationRunner(UserService userService, AccountService accountService, AccountRepository accountRepository) {
         this.userService = userService;
         this.accountService = accountService;
+        this.accountRepository = accountRepository;
     }
 
     @Override
@@ -36,6 +43,6 @@ public class MyApplicationRunner implements ApplicationRunner {
         Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
         // Add account
 
-        accountService.addAccount(account1);
+        accountService.createAccount(account1);
     }
 }
