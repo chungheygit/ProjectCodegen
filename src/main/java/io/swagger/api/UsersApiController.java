@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.model.Login;
+import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.UserService;
@@ -40,6 +41,31 @@ public class UsersApiController implements UsersApi {
         this.userService = userService;
     }
 
+    // GET ALL USERS
+    public ResponseEntity<List<User>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter users by email" ,schema=@Schema()) @Valid @RequestParam(value = "email", required = false) String email) throws Exception {
+        String accept = request.getHeader("Accept");
+
+        List <User> users = new ArrayList<User>();
+        try {
+            // GET ALL USERS BY MAIL
+            if (email != null) {
+                User u = userService.findUserByEmail(email);
+                users = new ArrayList<User>();
+                if (u == null)
+                    return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
+                users.add(u);
+                return new ResponseEntity<List<User>>(users, HttpStatus.OK);
+            }
+            //RETURN USERS WITH OR WITHOUT LIMIT AND OFFSET
+            return new ResponseEntity<List<User>>(userService.getAllUsers(limit, offset), HttpStatus.OK);
+        } catch (IllegalArgumentException iae) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    // CREATE A NEW USER
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody User body) {
         String accept = request.getHeader("Accept");
         //Create User
@@ -50,30 +76,7 @@ public class UsersApiController implements UsersApi {
         }
     }
 
-    public ResponseEntity<List<User>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter users by email" ,schema=@Schema()) @Valid @RequestParam(value = "email", required = false) String email) {
-        String accept = request.getHeader("Accept");
-
-        //Get all users
-        try {
-            //filter email
-            if (email != null) {
-                User u = userService.findUserByEmail(email);
-                List<User> users = new ArrayList<User>();
-                if (u == null)
-                    return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-                users.add(u);
-                return new ResponseEntity<List<User>>(users, HttpStatus.OK);
-            }
-            return new ResponseEntity<List<User>>(userService.getAllUsers(),HttpStatus.OK);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
-
-    }
-
+    // GET A USER BY ITS ID
     public ResponseEntity<User> getUserById(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
 )) @PathVariable("userId") Integer userId) {
         String accept = request.getHeader("Accept");
