@@ -106,7 +106,7 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "403", description = "Forbidden"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/transactions/{iban}",
+    @RequestMapping(value = "/transactions/trigger/{iban}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<List<Transaction>> getTransactionsByIban(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
