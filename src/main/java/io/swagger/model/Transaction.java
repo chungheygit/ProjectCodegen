@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
@@ -21,7 +24,7 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
-
+@NoArgsConstructor
 public class Transaction   {
   @Id
   @GeneratedValue
@@ -45,6 +48,15 @@ public class Transaction   {
 
   @JsonProperty("description")
   private String description = null;
+
+  public Transaction(Integer userPerforming, OffsetDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
+    this.userPerforming = userPerforming;
+    this.timestamp = timestamp;
+    this.sender = sender;
+    this.receiver = receiver;
+    this.amount = amount;
+    this.description = description;
+  }
 
   public Transaction id(Integer id) {
     this.id = id;
