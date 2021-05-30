@@ -61,7 +61,7 @@ public class AccountService {
         if(getAccountByIban(iban)==null){
             throw new Exception("Account does not exist");
         }
-        return getAccountByIban(iban);
+        return accountRepository.getAccountByIban(iban);
     }
 
     public Account createAccount(Account account){
@@ -83,10 +83,6 @@ public class AccountService {
    // public Boolean ibanExists(String IBAN){
      //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
    // }
-    
-    public Account getAccountByIban(String iban) throws Exception {
-        return accountRepository.getAccountByIban(iban);
-    }
 
     protected void addToBalance(Account account, BigDecimal amount){
         account.setBalance(account.getBalance().add(amount));
