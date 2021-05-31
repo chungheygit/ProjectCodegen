@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,10 +35,10 @@ public class AccountService {
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
     }
-    public Account getAccountByCreatedDate(LocalDate date){
+    public Account getAccountByCreatedDate(LocalDateTime date){
         if(date == null)
         {
-            date = LocalDate.now();
+            date = LocalDateTime.now();
         }
 
         return accountRepository.getAccountByCreatedDate(date);

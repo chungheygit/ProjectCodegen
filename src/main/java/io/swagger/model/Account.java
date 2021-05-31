@@ -1,5 +1,6 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -36,7 +37,7 @@ public class Account   {
   private BigDecimal balance = new BigDecimal(0);
 
   @JsonProperty("createdDate")
-  private LocalDate createdDate = null;
+  private LocalDateTime createdDate = null;
 
   /**
    * Gets or Sets accountType
@@ -82,7 +83,7 @@ public class Account   {
     return this;
   }
 
-  public Account(Long userId, String iban, BigDecimal balance, LocalDate createdDate, AccountTypeEnum accountType, BigDecimal absoluteLimit, Boolean open) {
+  public Account(Long userId, String iban, BigDecimal balance, LocalDateTime createdDate, AccountTypeEnum accountType, BigDecimal absoluteLimit, Boolean open) {
     this.userId = userId;
     this.iban = iban;
     this.balance = balance;
@@ -152,7 +153,7 @@ public class Account   {
     this.balance = balance;
   }
 
-  public Account createdDate(LocalDate createdDate) {
+  public Account createdDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -165,11 +166,11 @@ public class Account   {
       @NotNull
 
     @Valid
-    public LocalDate getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDate createdDate) {
+  public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
   }
 

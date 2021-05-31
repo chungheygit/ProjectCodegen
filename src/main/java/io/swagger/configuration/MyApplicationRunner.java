@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.threeten.bp.LocalDate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -45,7 +46,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         userService.createUser(user1);
 
         // Create an Account
-        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
+        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), LocalDateTime.of(2021,05,27,12,00), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
         // Add account
 
         accountService.createAccount(account1);
