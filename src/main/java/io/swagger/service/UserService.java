@@ -30,4 +30,6 @@ public class UserService {
 
     public User getUserById (long id){ return userRepository.findById(id).get(); }
 
+    public User updateUser(User targetUser) { return userRepository.save(targetUser); }
+
 }

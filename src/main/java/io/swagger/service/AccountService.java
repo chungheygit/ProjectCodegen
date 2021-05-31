@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
 import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -44,25 +43,26 @@ public class AccountService {
     }
     public Account updateAccount(Account account) throws Exception
     {
+        User user = userService.getUserById(account.getUserId());
 
         String Iban = account.getIban();
         if (Iban == null)
         {
             throw new Exception("Account does not exist");
         }
-
+        else if (Iban != null && user.getUserType() == User.UserTypeEnum.CUSTOMER)
+        {
+            throw new Exception("No access for customers to update account details");
+        }
         return  accountRepository.save(account);
 
-    }
-    public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
-        return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     public Account getAccountByIban(String iban) throws Exception {
         if(getAccountByIban(iban)==null){
             throw new Exception("Account does not exist");
         }
-        return getAccountByIban(iban);
+        return accountRepository.getAccountByIban(iban);
     }
 
     public Account createAccount(Account account){
@@ -85,13 +85,14 @@ public class AccountService {
      //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
    // }
 
-
     protected void addToBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
     }
 
     protected void subtractFromBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
     }
 }
 
