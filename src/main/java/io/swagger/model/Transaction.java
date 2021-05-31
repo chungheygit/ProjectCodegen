@@ -65,18 +65,6 @@ public class Transaction   {
     return this;
   }
 
-  public Transaction() {
-  }
-
-  public Transaction ( /*Integer userPerform,*/ String sender, String receiver, BigDecimal amount, String description) {
-    //this.userPerforming = userPerforming;
-    this.timestamp = OffsetDateTime.now();
-    this.sender = sender;
-    this.receiver = receiver;
-    this.amount = amount;
-    this.description = description;
-  }
-
   /**
    * Get id
    * @return id

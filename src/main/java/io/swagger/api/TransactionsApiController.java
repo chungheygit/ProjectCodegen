@@ -1,9 +1,9 @@
 package io.swagger.api;
 
 import io.swagger.service.TransactionService;
-import org.h2.mvstore.Page;
+
 import org.springframework.format.annotation.DateTimeFormat;
-import org.threeten.bp.OffsetDateTime;
+
 import io.swagger.model.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,10 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.awt.print.Pageable;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
@@ -61,12 +58,12 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     public ResponseEntity<List<Transaction>> getAllTransactions(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-    )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-    )) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) OffsetDateTime startDateTime,@Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) OffsetDateTime endDateTime) {
+    )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) LocalDate startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) LocalDate endDateTime) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<List<Transaction>>(service.getAllTransactions(), HttpStatus.OK);
+                return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
             } catch (IllegalArgumentException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -80,7 +77,7 @@ public class TransactionsApiController implements TransactionsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<Transaction>(service.getTransactionById(transactionId),HttpStatus.OK);
+                return new ResponseEntity<Transaction>(transactionService.getTransactionById(transactionId),HttpStatus.OK);
             } catch (IllegalArgumentException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Transaction>(HttpStatus.NOT_FOUND);
