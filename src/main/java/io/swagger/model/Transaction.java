@@ -13,9 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -29,7 +27,8 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class Transaction   {
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
+  @SequenceGenerator(name = "account_seq", initialValue = 1, allocationSize = 1)
   @JsonProperty("id")
   private Integer id = null;
 
@@ -64,6 +63,18 @@ public class Transaction   {
   public Transaction id(Integer id) {
     this.id = id;
     return this;
+  }
+
+  public Transaction() {
+  }
+
+  public Transaction ( /*Integer userPerform,*/ String sender, String receiver, BigDecimal amount, String description) {
+    //this.userPerforming = userPerforming;
+    this.timestamp = OffsetDateTime.now();
+    this.sender = sender;
+    this.receiver = receiver;
+    this.amount = amount;
+    this.description = description;
   }
 
   /**
