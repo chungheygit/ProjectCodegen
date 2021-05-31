@@ -5,12 +5,12 @@ import io.swagger.model.Transaction;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
-import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 @Service
 public class TransactionService {
@@ -52,16 +52,21 @@ public class TransactionService {
                 }
             }
         }
-        //check limits
+        //check limits!!!!!
 
-        transaction.setTimestamp(OffsetDateTime.now());
-        //userPerforming
+        transaction.setTimestamp(LocalDateTime.now());
+        //userPerforming!!!!!!!
         accountService.addToBalance(receiver, transaction.getAmount());
         accountService.subtractFromBalance(sender, transaction.getAmount());
 
         accountRepository.save(receiver);
         accountRepository.save(sender);
         return transactionRepository.save(transaction);
+    }
+
+    public List<Transaction> getTransactionsByIban(String iban, Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
+
+        return transactionRepository.getTransactionsByIban(iban, offset, limit, startDate, endDate);
     }
 
 

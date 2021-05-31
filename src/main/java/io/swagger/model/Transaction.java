@@ -1,11 +1,14 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
-import org.threeten.bp.OffsetDateTime;
+
+import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -19,7 +22,7 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
-
+@NoArgsConstructor
 public class Transaction   {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
@@ -31,7 +34,8 @@ public class Transaction   {
   private Integer userPerforming = null;
 
   @JsonProperty("timestamp")
-  private OffsetDateTime timestamp = null;
+  @DateTimeFormat(pattern = "dd-MM-yyyy")
+  private LocalDateTime timestamp = null;
 
   @JsonProperty("sender")
   private String sender = null;
@@ -45,21 +49,18 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
-  public Transaction id(Integer id) {
-    this.id = id;
-    return this;
-  }
-
-  public Transaction() {
-  }
-
-  public Transaction ( /*Integer userPerform,*/ String sender, String receiver, BigDecimal amount, String description) {
-    //this.userPerforming = userPerforming;
-    this.timestamp = OffsetDateTime.now();
+  public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
+    this.userPerforming = userPerforming;
+    this.timestamp = timestamp;
     this.sender = sender;
     this.receiver = receiver;
     this.amount = amount;
     this.description = description;
+  }
+
+  public Transaction id(Integer id) {
+    this.id = id;
+    return this;
   }
 
   /**
@@ -97,7 +98,7 @@ public class Transaction   {
     this.userPerforming = userPerforming;
   }
 
-  public Transaction timestamp(OffsetDateTime timestamp) {
+  public Transaction timestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -110,11 +111,11 @@ public class Transaction   {
       @NotNull
 
     @Valid
-    public OffsetDateTime getTimestamp() {
+    public LocalDateTime getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public void setTimestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
   }
 
