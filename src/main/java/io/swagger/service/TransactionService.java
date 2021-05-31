@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 
 @Service
@@ -21,6 +22,9 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
         this.accountRepository = accountRepository;
         this.accountService = accountService;
+    }
+    public List<Transaction> getAllTransactions() {
+        return (List<Transaction>) transactionRepository.findAll();
     }
 
     public Transaction createTransaction(Transaction transaction) throws Exception{

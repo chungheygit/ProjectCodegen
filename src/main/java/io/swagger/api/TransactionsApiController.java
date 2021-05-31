@@ -74,8 +74,8 @@ public class TransactionsApiController implements TransactionsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<List<Transaction>>(objectMapper.readValue("[ {\n  \"amount\" : 0.15658129805029453,\n  \"userPerforming\" : 6,\n  \"receiver\" : \"receiver\",\n  \"sender\" : \"sender\",\n  \"description\" : \"description\",\n  \"id\" : 0,\n  \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\"\n}, {\n  \"amount\" : 0.15658129805029453,\n  \"userPerforming\" : 6,\n  \"receiver\" : \"receiver\",\n  \"sender\" : \"sender\",\n  \"description\" : \"description\",\n  \"id\" : 0,\n  \"timestamp\" : \"2000-01-23T04:56:07.000+00:00\"\n} ]", List.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                return new ResponseEntity<List<Transaction>>(service.getAllTransactions(), HttpStatus.OK);
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }

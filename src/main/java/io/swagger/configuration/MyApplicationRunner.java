@@ -1,6 +1,7 @@
 package io.swagger.configuration;
 
 import io.swagger.model.Account;
+import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.threeten.bp.LocalDate;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
@@ -24,11 +27,13 @@ public class MyApplicationRunner implements ApplicationRunner {
     //Add all repositories here and in constructor (or @Autowired)
 
     private AccountRepository accountRepository;
+    private TransactionRepository transactionRepository;
 
-    public MyApplicationRunner(UserService userService, AccountService accountService, AccountRepository accountRepository) {
+    public MyApplicationRunner(UserService userService, AccountService accountService, AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.userService = userService;
         this.accountService = accountService;
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
@@ -44,5 +49,12 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Add account
 
         accountService.createAccount(account1);
+
+        // create a transaction
+        List<Transaction> transactions =
+                Arrays.asList(
+                        new Transaction("NL58INHO0255874139","NL58INHO0255885478",new BigDecimal(999.25 ),"")
+                );
+        transactions.forEach(transactionRepository::save);
     }
 }
