@@ -100,18 +100,19 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId) {
+)) @PathVariable("userId") Integer userId, @Valid @RequestBody User body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"firstName\",\n  \"lastName\" : \"lastName\",\n  \"password\" : \"password\",\n  \"dayLimit\" : 1.6027456183070403,\n  \"dateOfBirth\" : \"2000-01-23\",\n  \"id\" : 1,\n  \"userType\" : [ \"customer\", \"customer\" ],\n  \"transactionLimit\" : 1.1465812980502945,\n  \"email\" : \"email\",\n  \"open\" : false\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (IOException e) {
+                User targetUser = userService.getUserById(userId);
+                return new ResponseEntity<User>(userService.updateUser(body), HttpStatus.OK);
+            } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
-        return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
+        return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
     }
 
 }

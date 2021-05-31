@@ -54,15 +54,17 @@ public class AccountService {
         return  accountRepository.save(account);
 
     }
+
     public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
         return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
     }
+
 
     public Account getAccountByIban(String iban) throws Exception {
         if(getAccountByIban(iban)==null){
             throw new Exception("Account does not exist");
         }
-        return getAccountByIban(iban);
+        return accountRepository.getAccountByIban(iban);
     }
 
     public Account createAccount(Account account){
@@ -85,13 +87,14 @@ public class AccountService {
      //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
    // }
 
-
     protected void addToBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
     }
 
     protected void subtractFromBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
     }
 }
 
