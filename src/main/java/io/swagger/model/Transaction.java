@@ -1,19 +1,16 @@
 package io.swagger.model;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
-
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -24,11 +21,10 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
-@NoArgsConstructor
+
 public class Transaction   {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
-  @SequenceGenerator(name = "account_seq", initialValue = 1, allocationSize = 1)
+  @GeneratedValue
   @JsonProperty("id")
   private Integer id = null;
 
@@ -36,8 +32,7 @@ public class Transaction   {
   private Integer userPerforming = null;
 
   @JsonProperty("timestamp")
-  @DateTimeFormat(pattern = "dd-MM-yyyy")
-  private LocalDateTime timestamp = null;
+  private OffsetDateTime timestamp = null;
 
   @JsonProperty("sender")
   private String sender = null;
@@ -50,15 +45,6 @@ public class Transaction   {
 
   @JsonProperty("description")
   private String description = null;
-
-  public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
-    this.userPerforming = userPerforming;
-    this.timestamp = timestamp;
-    this.sender = sender;
-    this.receiver = receiver;
-    this.amount = amount;
-    this.description = description;
-  }
 
   public Transaction id(Integer id) {
     this.id = id;
@@ -115,7 +101,7 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
     this.userPerforming = userPerforming;
   }
 
-  public Transaction timestamp(LocalDateTime timestamp) {
+  public Transaction timestamp(OffsetDateTime timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -128,11 +114,11 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
       @NotNull
 
     @Valid
-    public LocalDateTime getTimestamp() {
+    public OffsetDateTime getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(LocalDateTime timestamp) {
+  public void setTimestamp(OffsetDateTime timestamp) {
     this.timestamp = timestamp;
   }
 

@@ -125,7 +125,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
     ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId, @Valid @RequestBody User body);
+)) @PathVariable("userId") Integer userId);
 
 }
 
