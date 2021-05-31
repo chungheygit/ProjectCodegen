@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class TransactionService {
@@ -26,12 +24,7 @@ public class TransactionService {
         this.accountService = accountService;
     }
     public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
-    }
-
-    public Transaction getTransactionById (Integer transactionId) throws IllegalArgumentException{
-        Optional<Transaction> optional = transactionRepository.findById(transactionId);
-        return optional.orElseThrow(IllegalArgumentException::new);
+        return (List<Transaction>) transactionRepository.findAll();
     }
 
     public Transaction createTransaction(Transaction transaction) throws Exception{
@@ -41,7 +34,7 @@ public class TransactionService {
 
         if(sender.getAccountType() == Account.AccountTypeEnum.SAVINGS || receiver.getAccountType() == Account.AccountTypeEnum.SAVINGS)
         {
-            if(!sender.getUserId().equals(receiver.getUserId())){
+            if(sender.getUserId() != receiver.getUserId()){
                 throw new Exception("Forbidden to transfer from/to savings account from another user.");
             }
             else{
@@ -53,10 +46,8 @@ public class TransactionService {
                 }
             }
         }
-        //check limits!!!!!
-
-        transaction.setTimestamp(LocalDateTime.now());
-        //userPerforming!!!!!!!
+        transaction.setTimestamp(OffsetDateTime.now());
+        //userPerforming
         accountService.addToBalance(receiver, transaction.getAmount());
         accountService.subtractFromBalance(sender, transaction.getAmount());
 
@@ -64,14 +55,6 @@ public class TransactionService {
         accountRepository.save(sender);
         return transactionRepository.save(transaction);
     }
-
-    public List<Transaction> getTransactionsByIban(String iban, Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
-
-        return transactionRepository.getTransactionsByIban(offset, limit, startDate, endDate,iban);
-    }
-//    public List<Transaction> getFilteredTransaction(Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
-//        return transactionRepository.getFilteredTransactions(offset,limit,startDate,endDate);
-//    }
 
 
 }

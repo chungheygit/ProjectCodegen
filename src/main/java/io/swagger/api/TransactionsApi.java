@@ -5,6 +5,8 @@
  */
 package io.swagger.api;
 
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -19,13 +21,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +74,7 @@ public interface TransactionsApi {
         method = RequestMethod.GET)
     ResponseEntity<List<Transaction>> getAllTransactions(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) LocalDate startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) LocalDate endDateTime);
+)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) OffsetDateTime startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) OffsetDateTime endDateTime);
 
 
     @Operation(summary = "Returns a transaction by id", description = "", tags={ "Transactions" })
@@ -101,7 +106,7 @@ public interface TransactionsApi {
         @ApiResponse(responseCode = "403", description = "Forbidden"),
         
         @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/transactions/trigger/{iban}",
+    @RequestMapping(value = "/transactions/{iban}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<List<Transaction>> getTransactionsByIban(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }

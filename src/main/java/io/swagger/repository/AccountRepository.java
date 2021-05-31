@@ -3,8 +3,6 @@ package io.swagger.repository;
 import io.swagger.model.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.threeten.bp.LocalDate;
 
@@ -18,6 +16,5 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
 
     @Query("select a from Account a where a.createdDate =:createdDate  ")
     public Account getAccountByCreatedDate(LocalDate createdDate);
-
 }
 
