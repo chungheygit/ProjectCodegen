@@ -65,6 +65,21 @@ public class Transaction   {
     return this;
   }
 
+  public Transaction ( /*Integer userPerform... door Abdelkhalak, Yassine
+
+Abdelkhalak, Yassine13:51
+public Transaction(/*Integer userPerforming, */ String sender, String receiver, BigDecimal amount, String description) {
+    //this.userPerforming = userPerforming;
+    this.timestamp = OffsetDateTime.now();
+    this.sender = sender;
+    this.receiver = receiver;
+    this.amount = amount;
+    this.description = description;
+  }
+
+  public Transaction() {
+  }
+
   /**
    * Get id
    * @return id

@@ -6,6 +6,7 @@ import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import io.swagger.model.Account;
+import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
@@ -39,11 +40,13 @@ public class MyApplicationRunner implements ApplicationRunner {
     //Add all repositories here and in constructor (or @Autowired)
 
     private AccountRepository accountRepository;
+    private TransactionRepository transactionRepository;
 
-    public MyApplicationRunner(UserService userService, AccountService accountService, AccountRepository accountRepository) {
+    public MyApplicationRunner(UserService userService, AccountService accountService, AccountRepository accountRepository, TransactionRepository transactionRepository) {
         this.userService = userService;
         this.accountService = accountService;
         this.accountRepository = accountRepository;
+        this.transactionRepository = transactionRepository;
     }
 
     @Override
