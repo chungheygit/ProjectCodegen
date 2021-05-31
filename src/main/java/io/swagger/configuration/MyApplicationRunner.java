@@ -50,12 +50,16 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Add account
 
         accountService.createAccount(account1);
+        accountService.createAccount(account2);
 
-        // create a transaction
-        List<Transaction> transactions =
-                Arrays.asList(
-                        new Transaction("NL58INHO0255874139","NL58INHO0255885478",new BigDecimal(999.25 ),"")
-                );
-        transactions.forEach(transactionRepository::save);
+        Transaction transaction1 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(200), "water bill");
+        Transaction transaction2 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456701", new BigDecimal(200), "water bill");
+        Transaction transaction3 = new Transaction(1, LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456789", "NL58INHO0123456702", new BigDecimal(200), "water bill");
+        Transaction transaction4 = new Transaction(1, LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456788", "NL58INHO0123456701", new BigDecimal(200), "water bill");
+
+        transactionRepository.save(transaction1);
+        transactionRepository.save(transaction2);
+        transactionRepository.save(transaction3);
+        transactionRepository.save(transaction4);
     }
 }
