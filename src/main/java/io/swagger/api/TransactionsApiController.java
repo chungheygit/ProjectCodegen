@@ -2,7 +2,7 @@ package io.swagger.api;
 
 import io.swagger.service.TransactionService;
 import org.h2.mvstore.Page;
-import org.threeten.bp.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,6 +23,8 @@ import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.awt.print.Pageable;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
@@ -95,12 +97,19 @@ public class TransactionsApiController implements TransactionsApi {
             @Min(1)@Max(100)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }))
             @Valid @RequestParam(value = "limit", required = false) Integer limit,
             @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema())
-            @Valid @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @Valid @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
             @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema())
-            @Valid @RequestParam(value = "endDate", required = false) LocalDate endDate) {
+                @Valid @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+                //defaultValue = "#{T(java.time.LocalDateTime).now()}"
+                if(startDate==null){
+                    startDate = LocalDate.of(1900,01,01);
+                }
+                if(endDate==null){
+                    endDate = LocalDate.now();
+                }
                 return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByIban(iban, offset, limit, startDate, endDate), HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);

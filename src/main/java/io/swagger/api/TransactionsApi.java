@@ -5,7 +5,6 @@
  */
 package io.swagger.api;
 
-import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +30,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 

@@ -20,6 +20,7 @@ import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
@@ -62,10 +63,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         accountService.createAccount(account1);
         accountService.createAccount(account2);
 
-        Transaction transaction1 = new Transaction(1, OffsetDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(200), "water bill");
-        Transaction transaction2 = new Transaction(1, OffsetDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456701", new BigDecimal(200), "water bill");
-        Transaction transaction3 = new Transaction(1, OffsetDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456702", new BigDecimal(200), "water bill");
-        Transaction transaction4 = new Transaction(1, OffsetDateTime.now(), "NL58INHO0123456788", "NL58INHO0123456701", new BigDecimal(200), "water bill");
+        Transaction transaction1 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(200), "water bill");
+        Transaction transaction2 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456701", new BigDecimal(200), "water bill");
+        Transaction transaction3 = new Transaction(1, LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456789", "NL58INHO0123456702", new BigDecimal(200), "water bill");
+        Transaction transaction4 = new Transaction(1, LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456788", "NL58INHO0123456701", new BigDecimal(200), "water bill");
 
         transactionRepository.save(transaction1);
         transactionRepository.save(transaction2);

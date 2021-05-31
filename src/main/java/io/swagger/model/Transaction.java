@@ -1,5 +1,6 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -8,6 +9,7 @@ import java.math.BigDecimal;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
@@ -35,7 +37,8 @@ public class Transaction   {
   private Integer userPerforming = null;
 
   @JsonProperty("timestamp")
-  private OffsetDateTime timestamp = null;
+  @DateTimeFormat(pattern = "dd-MM-yyyy")
+  private LocalDateTime timestamp = null;
 
   @JsonProperty("sender")
   private String sender = null;
@@ -49,7 +52,7 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
-  public Transaction(Integer userPerforming, OffsetDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
+  public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
     this.userPerforming = userPerforming;
     this.timestamp = timestamp;
     this.sender = sender;
@@ -98,7 +101,7 @@ public class Transaction   {
     this.userPerforming = userPerforming;
   }
 
-  public Transaction timestamp(OffsetDateTime timestamp) {
+  public Transaction timestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -111,11 +114,11 @@ public class Transaction   {
       @NotNull
 
     @Valid
-    public OffsetDateTime getTimestamp() {
+    public LocalDateTime getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public void setTimestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
   }
 
