@@ -63,7 +63,14 @@ public class TransactionsApiController implements TransactionsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+//                if(offset==null && limit==null && startDateTime==null && endDateTime==null){
+//                    return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
+//                }
+//                else{
+//                    return new ResponseEntity<List<Transaction>>(transactionService.getFilteredTransaction(offset, limit, startDateTime, endDateTime), HttpStatus.OK);
+//                }
                 return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
+
             } catch (IllegalArgumentException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR);

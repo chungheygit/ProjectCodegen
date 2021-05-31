@@ -5,6 +5,7 @@ import io.swagger.model.Transaction;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
+import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -66,8 +67,11 @@ public class TransactionService {
 
     public List<Transaction> getTransactionsByIban(String iban, Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
 
-        return transactionRepository.getTransactionsByIban(iban, offset, limit, startDate, endDate);
+        return transactionRepository.getTransactionsByIban(offset, limit, startDate, endDate,iban);
     }
+//    public List<Transaction> getFilteredTransaction(Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
+//        return transactionRepository.getFilteredTransactions(offset,limit,startDate,endDate);
+//    }
 
 
 }
