@@ -1,5 +1,6 @@
 package io.swagger.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +9,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
-import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
@@ -37,7 +37,7 @@ public class Account   {
   private BigDecimal balance = new BigDecimal(0);
 
   @JsonProperty("createdDate")
-  private LocalDateTime createdDate = null;
+  private LocalDate createdDate = null;
 
   /**
    * Gets or Sets accountType
@@ -83,7 +83,7 @@ public class Account   {
     return this;
   }
 
-  public Account(Long userId, String iban, BigDecimal balance, LocalDateTime createdDate, AccountTypeEnum accountType, BigDecimal absoluteLimit, Boolean open) {
+  public Account(Long userId, String iban, BigDecimal balance, LocalDate createdDate, AccountTypeEnum accountType, BigDecimal absoluteLimit, Boolean open) {
     this.userId = userId;
     this.iban = iban;
     this.balance = balance;
@@ -153,7 +153,7 @@ public class Account   {
     this.balance = balance;
   }
 
-  public Account createdDate(LocalDateTime createdDate) {
+  public Account createdDate(LocalDate createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -166,11 +166,11 @@ public class Account   {
       @NotNull
 
     @Valid
-    public LocalDateTime getCreatedDate() {
+    public LocalDate getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(LocalDate createdDate) {
     this.createdDate = createdDate;
   }
 

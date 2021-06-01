@@ -1,15 +1,12 @@
 package io.swagger.service;
 
 import io.swagger.model.Account;
-import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.stereotype.Service;
-import org.threeten.bp.LocalDate;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -35,10 +32,10 @@ public class AccountService {
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
     }
-    public Account getAccountByCreatedDate(LocalDateTime date){
+    public Account getAccountByCreatedDate(LocalDate date){
         if(date == null)
         {
-            date = LocalDateTime.now();
+            date = LocalDate.now();
         }
 
         return accountRepository.getAccountByCreatedDate(date);
@@ -54,10 +51,6 @@ public class AccountService {
 
         return  accountRepository.save(account);
 
-    }
-
-    public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
-        return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     public Account getAccountByIban(String iban) throws Exception {
