@@ -24,7 +24,6 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
-@NoArgsConstructor
 public class Transaction   {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
@@ -70,7 +69,7 @@ public class Transaction   {
 Abdelkhalak, Yassine13:51
 public Transaction(/*Integer userPerforming, */ String sender, String receiver, BigDecimal amount, String description) {
     //this.userPerforming = userPerforming;
-    this.timestamp = OffsetDateTime.now();
+    this.timestamp = LocalDateTime.now();
     this.sender = sender;
     this.receiver = receiver;
     this.amount = amount;

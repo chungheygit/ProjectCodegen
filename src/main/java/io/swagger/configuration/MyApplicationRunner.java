@@ -30,9 +30,6 @@ public class MyApplicationRunner implements ApplicationRunner {
 
 
     //Add all repositories here and in constructor (or @Autowired)
-    @Autowired
-    private TransactionRepository transactionRepository;
-
     private UserService userService;
 
     private AccountService accountService;

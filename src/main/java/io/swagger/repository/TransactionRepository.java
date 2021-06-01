@@ -14,5 +14,6 @@ import java.util.List;
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
     @Query(value = "SELECT * FROM Transaction WHERE sender = ?5 or receiver = ?5 AND timestamp >= ?3 and timestamp <= ?4 limit ?2 offset ?1", nativeQuery = true)
     public List<Transaction> getTransactionsByIban(Integer offset, Integer limit, LocalDate startDate, LocalDate endDate,String iban);
+
     //List<Transaction> getTransactionsByFilters(Integer offset, Integer limit, LocalDate startDateTime, LocalDate endDateTime);
 }
