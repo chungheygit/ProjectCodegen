@@ -50,7 +50,7 @@ public class AccountService {
         {
             throw new Exception("Account does not exist");
         }
-        else if (Iban != null && user.getUserType() == User.UserTypeEnum.CUSTOMER)
+        else if (Iban != null && user.getUserType() == User.UserTypeEnum.ROLE_CUSTOMER)
         {
             throw new Exception("No access for customers to update account details");
         }
