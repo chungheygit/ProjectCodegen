@@ -48,8 +48,8 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Create one new user
-        User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio","password", User.UserTypeEnum.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
-        User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio","password", User.UserTypeEnum.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio@test.com","password", User.UserTypeEnum.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio@test2.com","password", User.UserTypeEnum.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
         // Add the shops
         userService.createUser(user1);
         userService.createUser(user2);
