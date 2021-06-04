@@ -99,7 +99,7 @@ public class UsersApiController implements UsersApi {
         if (accept != null && accept.contains("application/json")) {
             try {
                 return new ResponseEntity<User>(objectMapper.readValue("{\n  \"firstName\" : \"firstName\",\n  \"lastName\" : \"lastName\",\n  \"password\" : \"password\",\n  \"dayLimit\" : 1.6027456183070403,\n  \"dateOfBirth\" : \"2000-01-23\",\n  \"id\" : 1,\n  \"userType\" : [ \"customer\", \"customer\" ],\n  \"transactionLimit\" : 1.1465812980502945,\n  \"email\" : \"email\",\n  \"open\" : false\n}", User.class), HttpStatus.NOT_IMPLEMENTED);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
