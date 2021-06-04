@@ -35,13 +35,15 @@ public class AccountService {
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
     }
-    public List<Account> getAccountByCreatedDate(java.time.LocalDate date){
-        if(date == null)
+    public List<Account> getAccountByCreatedDate(java.time.LocalDate date, Integer offset, Integer limit){
+        if(date == null || offset == null || limit == null)
         {
             date = java.time.LocalDate.now();
+            offset= 0;
+            limit = 5;
         }
 
-        return (List<Account>) accountRepository.getAccountByCreatedDate(date);
+        return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
     }
     public Account updateAccount(Account account) throws Exception
     {
@@ -67,6 +69,7 @@ public class AccountService {
     }
 
     public Account createAccount(Account account){
+
          return accountRepository.save(account);
     }
 

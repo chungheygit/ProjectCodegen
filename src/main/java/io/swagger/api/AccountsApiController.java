@@ -81,12 +81,12 @@ public class AccountsApiController implements AccountsApi {
             try {
                 if(createdDate != null)
                 {
-                    List<Account> a = accountService.getAccountByCreatedDate(createdDate);
+                    List<Account> a = accountService.getAccountByCreatedDate(createdDate, offset, limit);
                     if (a == null)
                         return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
                     return new ResponseEntity<List<Account>>(a, HttpStatus.OK);
                 }
-                return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountByCreatedDate(createdDate), HttpStatus.OK);
+                return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountByCreatedDate(createdDate, offset, limit), HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR);
