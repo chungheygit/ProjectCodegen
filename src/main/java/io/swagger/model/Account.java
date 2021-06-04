@@ -38,7 +38,7 @@ public class Account   {
   private BigDecimal balance = new BigDecimal(0);
 
   @JsonProperty("createdDate")
-  private LocalDate createdDate = null;
+  private java.time.LocalDate createdDate = null;
 
   @Enumerated(EnumType.STRING)
   @JsonProperty("accountType")
@@ -55,7 +55,7 @@ public class Account   {
     return this;
   }
 
-  public Account(Long userId, String iban, BigDecimal balance, LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
+  public Account(Long userId, String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
     this.userId = userId;
     this.iban = iban;
     this.balance = balance;
@@ -125,7 +125,7 @@ public class Account   {
     this.balance = balance;
   }
 
-  public Account createdDate(LocalDate createdDate) {
+  public Account createdDate(java.time.LocalDate createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -138,11 +138,11 @@ public class Account   {
       @NotNull
 
     @Valid
-    public LocalDate getCreatedDate() {
+    public java.time.LocalDate getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDate createdDate) {
+  public void setCreatedDate(java.time.LocalDate createdDate) {
     this.createdDate = createdDate;
   }
 

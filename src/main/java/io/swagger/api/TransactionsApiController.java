@@ -57,7 +57,7 @@ public class TransactionsApiController implements TransactionsApi {
         return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<Transaction>> getAllTransactions(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
+    public ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
     )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
     )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) LocalDate startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) LocalDate endDateTime) {
         String accept = request.getHeader("Accept");
@@ -69,7 +69,8 @@ public class TransactionsApiController implements TransactionsApi {
 //                else{
 //                    return new ResponseEntity<List<Transaction>>(transactionService.getFilteredTransaction(offset, limit, startDateTime, endDateTime), HttpStatus.OK);
 //                }
-                return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
+                return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByIban(iban, offset, limit, startDateTime, endDateTime), HttpStatus.OK);
+                //return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
 
             } catch (IllegalArgumentException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
