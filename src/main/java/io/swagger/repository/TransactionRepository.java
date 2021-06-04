@@ -12,7 +12,17 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
-    @Query(value = "SELECT * FROM Transaction WHERE sender = ?1 or receiver = ?1 AND timestamp >= ?4 and timestamp <= ?5 limit ?3 offset ?2", nativeQuery = true)
-    public List<Transaction> getTransactionsByIban(String iban, Integer offset, Integer limit, LocalDate startDate, LocalDate endDate);
+    @Query(value = "SELECT * FROM Transaction WHERE timestamp BETWEEN ?2 AND ?3 AND  Id IN ( SELECT Id FROM Transaction WHERE SENDER = ?1 OR RECEIVER = ?1) limit ?4 offset ?5", nativeQuery = true)
+    List<Transaction> getTransactionsByFilters(String iban, LocalDate startDate, LocalDate endDate, Integer limit, Integer offset);
+
+    @Query(value = "SELECT * FROM Transaction WHERE timestamp BETWEEN ?1 AND ?2 limit ?3 offset ?4", nativeQuery = true)
+    List<Transaction> getTransactionsByDay(LocalDate startDate, LocalDate endDate, Integer limit, Integer offset);
+
+    @Query(value = "SELECT * FROM Transaction WHERE SENDER = ?1 OR RECEIVER = ?1 limit ?2 offset ?3", nativeQuery = true)
+    List<Transaction> getTransactionsByIban(String iban, Integer limit, Integer offset);
+
     //List<Transaction> getTransactionsByFilters(Integer offset, Integer limit, LocalDate startDateTime, LocalDate endDateTime);
+
+    //SELECT * FROM Transaction WHERE timestamp BETWEEN '2020-12-12 ' AND '2021-06-05' AND ID IN ( SELECT ID FROM TRANSACTION WHERE SENDER = 'NL58INHO0123456788' OR RECEIVER = 'NL58INHO0123456788')
+
 }

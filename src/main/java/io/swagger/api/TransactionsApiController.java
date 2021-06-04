@@ -1,5 +1,7 @@
 package io.swagger.api;
 
+import io.swagger.model.Account;
+import io.swagger.service.AccountService;
 import io.swagger.service.TransactionService;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -35,12 +37,14 @@ public class TransactionsApiController implements TransactionsApi {
     private final HttpServletRequest request;
 
     private TransactionService transactionService;
+    private AccountService accountService;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service) {
+    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service, AccountService accountService) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.transactionService = service;
+        this.accountService=accountService;
     }
 
     public ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Transaction body) {
@@ -57,24 +61,17 @@ public class TransactionsApiController implements TransactionsApi {
         return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
+    public ResponseEntity<List<Transaction>> getAllTransactions(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
     )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-    )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) LocalDate startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) LocalDate endDateTime) {
+    )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) String startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) String endDateTime) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-//                if(offset==null && limit==null && startDateTime==null && endDateTime==null){
-//                    return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
-//                }
-//                else{
-//                    return new ResponseEntity<List<Transaction>>(transactionService.getFilteredTransaction(offset, limit, startDateTime, endDateTime), HttpStatus.OK);
-//                }
-                return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByIban(iban, offset, limit, startDateTime, endDateTime), HttpStatus.OK);
-                //return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
+                return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByFilters(iban, offset, limit, startDateTime, endDateTime), HttpStatus.OK);
 
             } catch (IllegalArgumentException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_FOUND);
             }
         }
 
@@ -95,34 +92,34 @@ public class TransactionsApiController implements TransactionsApi {
         return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    public ResponseEntity<List<Transaction>> getTransactionsByIban(
-            @Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,
-            @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }))
-            @Valid @RequestParam(value = "offset", required = false) Integer offset,
-            @Min(1)@Max(100)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }))
-            @Valid @RequestParam(value = "limit", required = false) Integer limit,
-            @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema())
-            @Valid @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
-            @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema())
-                @Valid @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                //defaultValue = "#{T(java.time.LocalDateTime).now()}"
-                if(startDate==null){
-                    startDate = LocalDate.of(1900,01,01);
-                }
-                if(endDate==null){
-                    endDate = LocalDate.now();
-                }
-                return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByIban(iban, offset, limit, startDate, endDate), HttpStatus.OK);
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_IMPLEMENTED);
-    }
+//    public ResponseEntity<List<Transaction>> getTransactionsByIban(
+//            @Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,
+//            @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }))
+//            @Valid @RequestParam(value = "offset", required = false) Integer offset,
+//            @Min(1)@Max(100)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }))
+//            @Valid @RequestParam(value = "limit", required = false) Integer limit,
+//            @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema())
+//            @Valid @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate startDate,
+//            @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema())
+//                @Valid @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate endDate) {
+//        String accept = request.getHeader("Accept");
+//        if (accept != null && accept.contains("application/json")) {
+//            try {
+//                //defaultValue = "#{T(java.time.LocalDateTime).now()}"
+//                if(startDate==null){
+//                    startDate = LocalDate.of(1900,01,01);
+//                }
+//                if(endDate==null){
+//                    endDate = LocalDate.now();
+//                }
+//                return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByIban(iban, offset, limit, startDate, endDate), HttpStatus.OK);
+//            } catch (Exception e) {
+//                log.error("Couldn't serialize response for content type application/json", e);
+//                return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR);
+//            }
+//        }
+//
+//        return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_IMPLEMENTED);
+//    }
 
 }

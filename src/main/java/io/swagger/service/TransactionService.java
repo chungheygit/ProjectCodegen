@@ -66,28 +66,37 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
-    public List<Transaction> getTransactionsByIban(String iban, Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
+    public List<Transaction> getTransactionsByFilters(String iban, Integer offset, Integer limit, String startDate, String endDate){
+
+        LocalDate parsedStartDate;
+        LocalDate parsedEndDate;
 
         //if filters are not used. get
         if(iban!=null || offset!=null || limit!=null || startDate!=null || endDate!=null){
+            if(startDate != null){
+                parsedStartDate = LocalDate.parse(startDate);
+            }
+            else{
+                parsedStartDate = LocalDate.of(1900,01,01);
+            }
+            if (endDate == null) {
+                parsedEndDate = LocalDate.now();
+            }
+            else{
+                parsedEndDate = LocalDate.parse(endDate);
+            }
             if(iban!=null) {
                 //account ophalen
                 Account account = accountRepository.getAccountByIban(iban);
 
                 if (startDate == null) {
-                    startDate = account.getCreatedDate();
+                    parsedStartDate = account.getCreatedDate();
                 }
             }
             else{
-                if (startDate == null) {
-                    startDate = LocalDate.now();
-
-                }
+                //geen iban
             }
-            if (endDate == null) {
-                endDate = LocalDate.now();
-            }
-            return transactionRepository.getTransactionsByIban(iban, offset, limit, startDate, endDate);
+            return transactionRepository.getTransactionsByFilters(iban, parsedStartDate, parsedEndDate, limit, offset );
         }
         else{
             return getAllTransactions();
