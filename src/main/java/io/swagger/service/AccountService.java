@@ -43,17 +43,12 @@ public class AccountService {
     }
     public Account updateAccount(Account account) throws Exception
     {
-        User user = userService.getUserById(account.getUserId());
-
         String Iban = account.getIban();
         if (Iban == null)
         {
             throw new Exception("Account does not exist");
         }
-        else if (Iban != null && user.getUserType() == User.UserTypeEnum.ROLE_CUSTOMER)
-        {
-            throw new Exception("No access for customers to update account details");
-        }
+
         return  accountRepository.save(account);
 
     }
