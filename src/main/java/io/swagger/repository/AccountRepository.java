@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -16,6 +17,6 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
     public Account getAccountByIban(String iban);
 
     @Query("select a from Account a where a.createdDate =:createdDate  ")
-    public Account getAccountByCreatedDate(LocalDate createdDate);
+    public List<Account> getAccountByCreatedDate(LocalDate createdDate);
 }
 

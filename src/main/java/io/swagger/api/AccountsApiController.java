@@ -81,12 +81,10 @@ public class AccountsApiController implements AccountsApi {
             try {
                 if(createdDate != null)
                 {
-                    Account a = accountService.getAccountByCreatedDate(createdDate);
-                    List<Account> accounts = new ArrayList<>();
+                    List<Account> a = accountService.getAccountByCreatedDate(createdDate);
                     if (a == null)
                         return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-                     accounts.add(a);
-                    return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
+                    return new ResponseEntity<List<Account>>(a, HttpStatus.OK);
                 }
                 return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountByCreatedDate(createdDate), HttpStatus.OK);
             } catch (Exception e) {

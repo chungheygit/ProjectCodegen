@@ -35,13 +35,13 @@ public class AccountService {
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
     }
-    public Account getAccountByCreatedDate(java.time.LocalDate date){
+    public List<Account> getAccountByCreatedDate(java.time.LocalDate date){
         if(date == null)
         {
             date = java.time.LocalDate.now();
         }
 
-        return accountRepository.getAccountByCreatedDate(date);
+        return (List<Account>) accountRepository.getAccountByCreatedDate(date);
     }
     public Account updateAccount(Account account) throws Exception
     {

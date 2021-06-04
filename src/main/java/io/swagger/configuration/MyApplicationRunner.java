@@ -46,10 +46,15 @@ public class MyApplicationRunner implements ApplicationRunner {
         userService.createUser(user1);
 
         // Create an Account
-        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,6,1), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
+        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9997 ), java.time.LocalDate.of(2021,06,1), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
+        Account account2 = new Account(2L, "NL58INHO0123456721", new BigDecimal(1000 ), java.time.LocalDate.of(2021,06,4), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
+        Account account3 = new Account(3L, "NL58INHO0123456709", new BigDecimal(505 ), java.time.LocalDate.of(2021,06,4), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
+
         // Add account
 
         accountService.createAccount(account1);
+        accountService.createAccount(account2);
+        accountService.createAccount(account3);
 
         // create a transaction
         List<Transaction> transactions =
