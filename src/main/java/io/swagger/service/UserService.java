@@ -62,7 +62,7 @@ public class UserService {
 
             User user = userRepository.findUserByEmail(loginDTO.getEmail());
 
-            return jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
+            return "Bearer " + jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
         }catch (AuthenticationException exception){
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "email/password invalid");
         }

@@ -3,6 +3,7 @@ package io.swagger.security;
 import io.swagger.model.User;
 import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -36,4 +37,9 @@ public class MyUserDetailsService implements UserDetailsService {
 
         return userDetails;
     }
+
+    public UserDetails getLoggedInUser(){
+        return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
 }

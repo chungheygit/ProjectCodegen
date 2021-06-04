@@ -23,7 +23,7 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
     private JwtTokenFilter jwtTokenFilter;
 
     private static final String[] AUTH_WHITELIST = {
-            "/login",
+            "/users/login",
             "/h2-console/**/**",
             "/swagger-ui/**/**",
             "/swagger-resources/**",
@@ -39,12 +39,11 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         http.authorizeRequests()
-                .antMatchers(AUTH_WHITELIST).permitAll();
-                //.anyRequest().authenticated(); //block everything else
+                .antMatchers(AUTH_WHITELIST).permitAll()
+                .anyRequest().authenticated();
 
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
-
 
     @Bean
     @Override
