@@ -9,6 +9,8 @@ import org.springframework.validation.annotation.Validated;
 import org.threeten.bp.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
@@ -27,6 +29,7 @@ import java.util.Objects;
 
 public class User {
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @JsonProperty("id")
   private Long id = null;
 
@@ -47,7 +50,7 @@ public class User {
 
   @JsonProperty("userType")
   @Valid
-  private UserTypeEnum userTypeEnum;
+  private UserType userTypeEnum;
 
   @JsonProperty("dayLimit")
   private BigDecimal dayLimit = null;
@@ -58,7 +61,7 @@ public class User {
   @JsonProperty("open")
   private Boolean open = null;
 
-  public User(Long id, String firstName, String lastName, LocalDate dateOfBirth, String email, String password, UserTypeEnum userTypeEnum, BigDecimal dayLimit, BigDecimal transactionLimit, Boolean open) {
+  public User(Long id, String firstName, String lastName, LocalDate dateOfBirth, String email, String password, UserType userTypeEnum, BigDecimal dayLimit, BigDecimal transactionLimit, Boolean open) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -74,44 +77,6 @@ public class User {
   //default constructor
   public User() {
   }
-
-  /**
-   * Gets or Sets userType
-   */
-  public enum UserTypeEnum implements GrantedAuthority {
-    ROLE_CUSTOMER("customer"),
-
-    ROLE_EMPLOYEE("employee");
-
-    private String value;
-
-    UserTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static UserTypeEnum fromValue(String text) {
-      for (UserTypeEnum b : UserTypeEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-
-    @Override
-    public String getAuthority() {
-      return value;
-    }
-  }
-
-
 
   public User id(Long id) {
     this.id = id;
@@ -234,12 +199,12 @@ public class User {
     this.password = password;
   }
 
-  public User userType(UserTypeEnum userType) {
+  public User userType(UserType userType) {
     this.userTypeEnum = userType;
     return this;
   }
 
-  public User addUserTypeItem(UserTypeEnum userTypeItem) {
+  public User addUserTypeItem(UserType userTypeItem) {
     this.userTypeEnum = userTypeItem;
     return this;
   }
@@ -251,11 +216,11 @@ public class User {
   @Schema(required = true, description = "")
   @NotNull
 
-  public UserTypeEnum getUserType() {
+  public UserType getUserType() {
     return userTypeEnum;
   }
 
-  public void setUserType(UserTypeEnum userType) {
+  public void setUserType(UserType userType) {
     this.userTypeEnum = userType;
   }
 

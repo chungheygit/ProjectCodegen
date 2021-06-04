@@ -27,11 +27,11 @@ import javax.validation.constraints.*;
 @NoArgsConstructor
 public class Transaction   {
   @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "account_seq")
-  @SequenceGenerator(name = "account_seq", initialValue = 1, allocationSize = 1)
+  @GeneratedValue
   @JsonProperty("id")
   private Integer id = null;
 
+  //@ManyToOne()
   @JsonProperty("userPerforming")
   private Integer userPerforming = null;
 
