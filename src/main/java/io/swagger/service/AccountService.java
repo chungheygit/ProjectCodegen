@@ -2,7 +2,6 @@ package io.swagger.service;
 
 import io.swagger.model.Account;
 import io.swagger.model.User;
-import io.swagger.model.UserType;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -46,17 +45,13 @@ public class AccountService {
     }
     public Account updateAccount(Account account) throws Exception
     {
-        User user = userService.getUserById(account.getUserId());
 
         String Iban = account.getIban();
         if (Iban == null)
         {
             throw new Exception("Account does not exist");
         }
-        else if (Iban != null && user.getUserType() == UserType.ROLE_CUSTOMER)
-        {
-            throw new Exception("No access for customers to update account details");
-        }
+
         return  accountRepository.save(account);
 
     }
