@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -47,7 +48,7 @@ public class TransactionService {
                 }
             }
         }
-        transaction.setTimestamp(OffsetDateTime.now());
+        transaction.setTimestamp(LocalDateTime.now());
         //userPerforming
         accountService.addToBalance(receiver, transaction.getAmount());
         accountService.subtractFromBalance(sender, transaction.getAmount());
