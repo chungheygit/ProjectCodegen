@@ -50,6 +50,18 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
+  public TransactionType getTransactionType() {
+    return transactionType;
+  }
+
+  public void setTransactionType(TransactionType transactionType) {
+    this.transactionType = transactionType;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @JsonProperty("transactionType")
+  private TransactionType transactionType = null;
+
   public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
     this.userPerforming = userPerforming;
     this.timestamp = timestamp;
