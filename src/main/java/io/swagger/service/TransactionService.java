@@ -1,6 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.model.Account;
+import io.swagger.model.AccountType;
 import io.swagger.model.Transaction;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
@@ -39,13 +40,13 @@ public class TransactionService {
         Account sender = accountService.getAccountByIban(transaction.getSender());
         Account receiver = accountService.getAccountByIban(transaction.getReceiver());
 
-        if(sender.getAccountType() == Account.AccountTypeEnum.SAVINGS || receiver.getAccountType() == Account.AccountTypeEnum.SAVINGS)
+        if(sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS)
         {
             if(!sender.getUserId().equals(receiver.getUserId())){
                 throw new Exception("Forbidden to transfer from/to savings account from another user.");
             }
             else{
-                if(sender.getAccountType() == Account.AccountTypeEnum.SAVINGS){
+                if(sender.getAccountType() == AccountType.SAVINGS){
                     transaction.setDescription("WITHDRAWAL - " + transaction.getDescription());
                 }
                 else{

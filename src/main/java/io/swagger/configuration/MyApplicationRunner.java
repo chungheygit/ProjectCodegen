@@ -1,12 +1,9 @@
 package io.swagger.configuration;
 
-import io.swagger.model.Transaction;
+import io.swagger.model.*;
 import io.swagger.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import io.swagger.model.Account;
-import io.swagger.model.Transaction;
-import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.service.AccountService;
@@ -48,17 +45,17 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Create one new user
-        User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio@test.com","password", User.UserTypeEnum.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
-        User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio@test2.com","password", User.UserTypeEnum.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio@test.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio@test2.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
         // Add the shops
         userService.createUser(user1);
         userService.createUser(user2);
 
         // Create an Account
-        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
-        Account account2 = new Account(2L, "NL58INHO0123456788", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
-        Account account3 = new Account(3L, "NL58INHO0123456701", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
-        Account account4 = new Account(4L, "NL58INHO0123456702", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), Account.AccountTypeEnum.CURRENT, new BigDecimal(500 ), true);
+        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account2 = new Account(2L, "NL58INHO0123456788", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account3 = new Account(3L, "NL58INHO0123456701", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account4 = new Account(4L, "NL58INHO0123456702", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
 
         // Add account
         accountService.createAccount(account1);
