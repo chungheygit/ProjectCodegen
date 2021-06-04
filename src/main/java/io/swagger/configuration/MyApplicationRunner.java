@@ -47,18 +47,18 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Create one new user
         User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio@test.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), true);
         User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio@test2.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), true);
-        User user3 = new User(3L, "test", "test", LocalDate.of(2021,12,20), "lio@test3.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
-        User user4 = new User(4L, "test", "test", LocalDate.of(2021,12,20), "lio@test4.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        User user3 = new User(3L, "test", "test", LocalDate.of(2021,12,20), "cus","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        User user4 = new User(4L, "test", "test", LocalDate.of(2021,12,20), "emp","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
         // Add the shops
         userService.createUser(user1);
         userService.createUser(user2);
         userService.createUser(user3);
         userService.createUser(user4);
         // Create an Account
-        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
-        Account account2 = new Account(2L, "NL58INHO0123456788", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
-        Account account3 = new Account(3L, "NL58INHO0123456701", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
-        Account account4 = new Account(4L, "NL58INHO0123456702", new BigDecimal(9999.25 ), LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account2 = new Account(2L, "NL58INHO0123456788", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account3 = new Account(3L, "NL58INHO0123456701", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account4 = new Account(4L, "NL58INHO0123456702", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
 
         // Add account
         accountService.createAccount(account1);
