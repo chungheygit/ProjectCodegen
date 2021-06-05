@@ -1,16 +1,15 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
-import org.threeten.bp.OffsetDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -20,7 +19,6 @@ import javax.validation.constraints.*;
 @Entity
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
-
 
 public class Transaction   {
   @Id
@@ -32,7 +30,8 @@ public class Transaction   {
   private Integer userPerforming = null;
 
   @JsonProperty("timestamp")
-  private OffsetDateTime timestamp = null;
+  @DateTimeFormat(pattern = "dd-MM-yyyy")
+  private LocalDateTime timestamp = null;
 
   @JsonProperty("sender")
   private String sender = null;
@@ -46,6 +45,27 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
+  public TransactionType getTransactionType() {
+    return transactionType;
+  }
+
+  public void setTransactionType(TransactionType transactionType) {
+    this.transactionType = transactionType;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @JsonProperty("transactionType")
+  private TransactionType transactionType = null;
+
+  public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
+    this.userPerforming = userPerforming;
+    this.timestamp = timestamp;
+    this.sender = sender;
+    this.receiver = receiver;
+    this.amount = amount;
+    this.description = description;
+  }
+
   public Transaction id(Integer id) {
     this.id = id;
     return this;
@@ -56,7 +76,7 @@ public class Transaction   {
 Abdelkhalak, Yassine13:51
 public Transaction(/*Integer userPerforming, */ String sender, String receiver, BigDecimal amount, String description) {
     //this.userPerforming = userPerforming;
-    this.timestamp = OffsetDateTime.now();
+    this.timestamp = LocalDateTime.now();
     this.sender = sender;
     this.receiver = receiver;
     this.amount = amount;
@@ -101,7 +121,7 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
     this.userPerforming = userPerforming;
   }
 
-  public Transaction timestamp(OffsetDateTime timestamp) {
+  public Transaction timestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -114,11 +134,11 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
       @NotNull
 
     @Valid
-    public OffsetDateTime getTimestamp() {
+    public LocalDateTime getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(OffsetDateTime timestamp) {
+  public void setTimestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
   }
 

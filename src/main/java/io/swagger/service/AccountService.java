@@ -4,6 +4,7 @@ import io.swagger.model.Account;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
@@ -17,18 +18,18 @@ import java.util.Random;
 @Service
 public class AccountService {
 
+    @Autowired
     AccountRepository accountRepository;
-
+    @Autowired
     UserRepository userRepository;
+    @Autowired
     UserService userService;
 
     // List of all IBANs saved to just use any IBAN one time
     ArrayList<String> usedIBANs;
 
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository, UserService userService) {
-        this.accountRepository = accountRepository;
-        this.userRepository = userRepository;
-        this.userService = userService;
+    public AccountService() {
+
         usedIBANs = new ArrayList<>();
 
     }
@@ -36,11 +37,11 @@ public class AccountService {
         return accountRepository.findAll();
     }
     public List<Account> getAccountByCreatedDate(java.time.LocalDate date, Integer offset, Integer limit){
-        if(date == null || offset == null || limit == null)
+        if(date == null && offset == null && limit == null)
         {
             date = java.time.LocalDate.now();
             offset= 0;
-            limit = 5;
+            limit = 10;
         }
 
         return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
@@ -62,12 +63,23 @@ public class AccountService {
     }
 
     public Account getAccountByIban(String iban) throws Exception {
-        if(getAccountByIban(iban)==null){
+        Account account = accountRepository.getAccountByIban(iban);
+
+        if(account==null){
             throw new Exception("Account does not exist");
         }
-        return getAccountByIban(iban);
+        return account;
     }
 
+    //makes sure a customer can only retrieve his own accounts
+    public Account getAccountByIbanWithSecurity(String iban) throws Exception {
+        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+            throw new Exception("User not authorized");
+        }
+        else{
+            return getAccountByIban(iban);
+        }
+    }
     public Account createAccount(Account account){
 
          return accountRepository.save(account);
