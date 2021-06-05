@@ -115,7 +115,8 @@ public class AccountService {
    // }
 
     protected void addToBalance(Account account, BigDecimal amount){
-        account.setBalance(account.getBalance().add(amount));
+        BigDecimal newBalance = amount.add(account.getBalance());
+        account.setBalance(newBalance);
         accountRepository.save(account);
     }
 
