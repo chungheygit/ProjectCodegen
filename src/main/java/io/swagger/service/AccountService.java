@@ -5,10 +5,13 @@ import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
+import io.swagger.security.MyUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -16,9 +19,13 @@ import java.util.Random;
 @Service
 public class AccountService {
 
+    @Autowired
+    MyUserDetailsService myUserDetailsService;
+
     AccountRepository accountRepository;
 
     UserRepository userRepository;
+
     UserService userService;
 
     // List of all IBANs saved to just use any IBAN one time
@@ -42,6 +49,7 @@ public class AccountService {
 
         return accountRepository.getAccountByCreatedDate(date);
     }
+
     public Account updateAccount(Account account) throws Exception
     {
         User user = userService.getUserById(account.getUserId());
@@ -58,12 +66,25 @@ public class AccountService {
         return  accountRepository.save(account);
 
     }
+    public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
+        return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
+    }
 
     public Account getAccountByIban(String iban) throws Exception {
         if(getAccountByIban(iban)==null){
             throw new Exception("Account does not exist");
         }
         return accountRepository.getAccountByIban(iban);
+    }
+
+    //makes sure a customer can only retrieve his own accounts
+    public Account getAccountByIbanWithSecurity(String iban) throws Exception {
+        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+            throw new Exception("User not authorized");
+        }
+        else{
+            return getAccountByIban(iban);
+        }
     }
 
     public Account createAccount(Account account){

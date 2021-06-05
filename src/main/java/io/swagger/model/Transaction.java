@@ -3,14 +3,10 @@ package io.swagger.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -24,14 +20,12 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
-@NoArgsConstructor
 public class Transaction   {
   @Id
   @GeneratedValue
   @JsonProperty("id")
   private Integer id = null;
 
-  //@ManyToOne()
   @JsonProperty("userPerforming")
   private Integer userPerforming = null;
 
@@ -51,6 +45,18 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
+  public TransactionType getTransactionType() {
+    return transactionType;
+  }
+
+  public void setTransactionType(TransactionType transactionType) {
+    this.transactionType = transactionType;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @JsonProperty("transactionType")
+  private TransactionType transactionType = null;
+
   public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
     this.userPerforming = userPerforming;
     this.timestamp = timestamp;
@@ -65,14 +71,29 @@ public class Transaction   {
     return this;
   }
 
+  public Transaction ( /*Integer userPerform... door Abdelkhalak, Yassine
+
+Abdelkhalak, Yassine13:51
+public Transaction(/*Integer userPerforming, */ String sender, String receiver, BigDecimal amount, String description) {
+    //this.userPerforming = userPerforming;
+    this.timestamp = LocalDateTime.now();
+    this.sender = sender;
+    this.receiver = receiver;
+    this.amount = amount;
+    this.description = description;
+  }
+
+  public Transaction() {
+  }
+
   /**
    * Get id
    * @return id
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public Integer getId() {
+  public Integer getId() {
     return id;
   }
 
@@ -90,9 +111,9 @@ public class Transaction   {
    * @return userPerforming
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public Integer getUserPerforming() {
+  public Integer getUserPerforming() {
     return userPerforming;
   }
 
@@ -110,10 +131,10 @@ public class Transaction   {
    * @return timestamp
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
-    public LocalDateTime getTimestamp() {
+  @Valid
+  public LocalDateTime getTimestamp() {
     return timestamp;
   }
 
@@ -131,9 +152,9 @@ public class Transaction   {
    * @return sender
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getSender() {
+  public String getSender() {
     return sender;
   }
 
@@ -151,9 +172,9 @@ public class Transaction   {
    * @return receiver
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getReceiver() {
+  public String getReceiver() {
     return receiver;
   }
 
@@ -172,9 +193,9 @@ public class Transaction   {
    * @return amount
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
+  @Valid
   @DecimalMin("0")  public BigDecimal getAmount() {
     return amount;
   }
@@ -193,9 +214,9 @@ public class Transaction   {
    * @return description
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getDescription() {
+  public String getDescription() {
     return description;
   }
 
@@ -214,12 +235,12 @@ public class Transaction   {
     }
     Transaction transaction = (Transaction) o;
     return Objects.equals(this.id, transaction.id) &&
-        Objects.equals(this.userPerforming, transaction.userPerforming) &&
-        Objects.equals(this.timestamp, transaction.timestamp) &&
-        Objects.equals(this.sender, transaction.sender) &&
-        Objects.equals(this.receiver, transaction.receiver) &&
-        Objects.equals(this.amount, transaction.amount) &&
-        Objects.equals(this.description, transaction.description);
+            Objects.equals(this.userPerforming, transaction.userPerforming) &&
+            Objects.equals(this.timestamp, transaction.timestamp) &&
+            Objects.equals(this.sender, transaction.sender) &&
+            Objects.equals(this.receiver, transaction.receiver) &&
+            Objects.equals(this.amount, transaction.amount) &&
+            Objects.equals(this.description, transaction.description);
   }
 
   @Override
@@ -231,7 +252,7 @@ public class Transaction   {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    userPerforming: ").append(toIndentedString(userPerforming)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");
