@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
+import io.swagger.model.DTO.AccountDTO;
 import io.swagger.model.User;
 import io.swagger.service.AccountService;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -46,11 +47,11 @@ public class AccountsApiController implements AccountsApi {
         this.accountService = accountService;
     }
 
-    public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Account body) {
+    public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody AccountDTO accountDTO) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<Account>(accountService.createAccount(body), HttpStatus.CREATED);
+                return new ResponseEntity<Account>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Account>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,9 +1,13 @@
 package io.swagger.service;
 
 import io.swagger.model.Account;
+import io.swagger.model.AccountType;
+import io.swagger.model.DTO.AccountDTO;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
+import io.swagger.security.MyUserDetailsService;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
@@ -24,6 +28,8 @@ public class AccountService {
     UserRepository userRepository;
     @Autowired
     UserService userService;
+    @Autowired
+    private MyUserDetailsService myUserDetailsService;
 
     // List of all IBANs saved to just use any IBAN one time
     ArrayList<String> usedIBANs;
@@ -80,9 +86,22 @@ public class AccountService {
             return getAccountByIban(iban);
         }
     }
-    public Account createAccount(Account account){
+    public Account createAccount(AccountDTO accountDTO){
+
+        ModelMapper modelMapper = new ModelMapper();
+        Account account = modelMapper.map(accountDTO, Account.class);
+
+
+        // filling properties
+        account.setIban(generateIban());
+        account.setCreatedDate(java.time.LocalDate.now());
+        account.setAbsoluteLimit(new BigDecimal(500));
+        account.setAccountType(AccountType.CURRENT);
+        account.setOpen(true);
+
 
          return accountRepository.save(account);
+
     }
 
     public String generateIban(){

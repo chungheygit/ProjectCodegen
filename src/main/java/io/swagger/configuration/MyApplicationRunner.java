@@ -58,16 +58,16 @@ public class MyApplicationRunner implements ApplicationRunner {
         userService.createUser(user4);
 
         // Create an Account
-        Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,01), AccountType.CURRENT, new BigDecimal(10 ), true);
-        Account account2 = new Account(2L, "NL58INHO0123456788", new BigDecimal(200 ), java.time.LocalDate.of(2021,06,03), AccountType.CURRENT, new BigDecimal(10 ), true);
-        Account account3 = new Account(3L, "NL58INHO0123456701", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,05), AccountType.CURRENT, new BigDecimal(10 ), true);
+        Account account1 = new Account( "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,01), AccountType.CURRENT, new BigDecimal(10 ), true);
+        Account account2 = new Account( "NL58INHO0123456788", new BigDecimal(200 ), java.time.LocalDate.of(2021,06,03), AccountType.CURRENT, new BigDecimal(10 ), true);
+        Account account3 = new Account( "NL58INHO0123456701", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,05), AccountType.CURRENT, new BigDecimal(10 ), true);
         //closed account
-        Account account4 = new Account(4L, "NL58INHO0123456702", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,04), AccountType.CURRENT, new BigDecimal(10 ), false);
+        Account account4 = new Account( "NL58INHO0123456702", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,04), AccountType.CURRENT, new BigDecimal(10 ), false);
 
-        accountService.createAccount(account1);
-        accountService.createAccount(account2);
-        accountService.createAccount(account3);
-        accountService.createAccount(account4);
+        accountRepository.save(account1);
+        accountRepository.save(account2);
+        accountRepository.save(account3);
+        accountRepository.save(account4);
 
         //Create transactions
         Transaction transaction1 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(100), "water bill");
