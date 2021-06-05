@@ -1,11 +1,15 @@
 package io.swagger.service;
 
+import io.swagger.api.UsersApiController;
 import io.swagger.model.Account;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.MyUserDetailsService;
+import lombok.extern.java.Log;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
@@ -25,16 +29,16 @@ public class AccountService {
     AccountRepository accountRepository;
 
     UserRepository userRepository;
-
+    @Autowired
     UserService userService;
+
 
     // List of all IBANs saved to just use any IBAN one time
     ArrayList<String> usedIBANs;
 
-    public AccountService(AccountRepository accountRepository, UserRepository userRepository, UserService userService) {
+    public AccountService(AccountRepository accountRepository, UserRepository userRepository) {
         this.accountRepository = accountRepository;
         this.userRepository = userRepository;
-        this.userService = userService;
         usedIBANs = new ArrayList<>();
 
     }
@@ -49,7 +53,6 @@ public class AccountService {
 
         return accountRepository.getAccountByCreatedDate(date);
     }
-
     public Account updateAccount(Account account) throws Exception
     {
         User user = userService.getUserById(account.getUserId());
@@ -66,15 +69,19 @@ public class AccountService {
         return  accountRepository.save(account);
 
     }
+
     public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
         return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
+
     public Account getAccountByIban(String iban) throws Exception {
-        if(getAccountByIban(iban)==null){
+        Account account = accountRepository.getAccountByIban(iban);
+
+        if(account==null){
             throw new Exception("Account does not exist");
         }
-        return accountRepository.getAccountByIban(iban);
+        return account;
     }
 
     //makes sure a customer can only retrieve his own accounts
@@ -88,7 +95,7 @@ public class AccountService {
     }
 
     public Account createAccount(Account account){
-         return accountRepository.save(account);
+        return accountRepository.save(account);
     }
 
     public String generateIban(){
@@ -103,12 +110,13 @@ public class AccountService {
         tenDigit3 = String.format("%02d", random.nextInt(100));
         return prefix1 + twoDigit  + prefix2  + tenDigit1  + tenDigit2  + tenDigit3;
     }
-   // public Boolean ibanExists(String IBAN){
-     //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
-   // }
+    // public Boolean ibanExists(String IBAN){
+    //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
+    // }
 
     protected void addToBalance(Account account, BigDecimal amount){
-        account.setBalance(account.getBalance().add(amount));
+        BigDecimal newBalance = amount.add(account.getBalance());
+        account.setBalance(newBalance);
         accountRepository.save(account);
     }
 
@@ -116,5 +124,7 @@ public class AccountService {
         account.setBalance(account.getBalance().subtract(amount));
         accountRepository.save(account);
     }
+
+
 }
 
