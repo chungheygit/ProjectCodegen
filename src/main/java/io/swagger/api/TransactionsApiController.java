@@ -1,11 +1,10 @@
 package io.swagger.api;
 
-
+import io.swagger.annotations.ApiParam;
 import io.swagger.model.DTO.TransactionDTO;
-import io.swagger.model.Account;
-import io.swagger.service.AccountService;
 import io.swagger.service.TransactionService;
 
+import io.swagger.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import io.swagger.model.Transaction;
@@ -39,14 +38,14 @@ public class TransactionsApiController implements TransactionsApi {
     private final HttpServletRequest request;
 
     private TransactionService transactionService;
-    private AccountService accountService;
+    private UserService userService;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service, AccountService accountService) {
+    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service, UserService userService) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.transactionService = service;
-        this.accountService=accountService;
+        this.userService=userService;
     }
 
     public ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionDTO transactionDTO) throws Exception {
@@ -59,6 +58,14 @@ public class TransactionsApiController implements TransactionsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+                //if customer tries to filter with different iban
+//                if(userService.getLoggedInUser().equals(UserType.ROLE_CUSTOMER) && !userService.IsIbanFromLoggedInUser(iban)){
+//                    return new ResponseEntity<List<Transaction>>(HttpStatus.UNAUTHORIZED);
+//                }
+
+                if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+                    return new ResponseEntity<List<Transaction>>(HttpStatus.UNAUTHORIZED);
+                }
                 return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByFilters(iban, offset, limit, startDateTime, endDateTime), HttpStatus.OK);
 
             } catch (IllegalArgumentException e) {
@@ -69,7 +76,6 @@ public class TransactionsApiController implements TransactionsApi {
 
         return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_IMPLEMENTED);
     }
-
     public ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "The transaction ID", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
@@ -83,7 +89,7 @@ public class TransactionsApiController implements TransactionsApi {
 
         return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
     }
-
+//
 //    public ResponseEntity<List<Transaction>> getTransactionsByIban(
 //            @Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,
 //            @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }))

@@ -62,8 +62,8 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<List<Account>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) LocalDate createdDate) {
+    )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) LocalDate createdDate) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
@@ -73,7 +73,7 @@ public class AccountsApiController implements AccountsApi {
                     List<Account> accounts = new ArrayList<>();
                     if (a == null)
                         return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-                     accounts.add(a);
+                    accounts.add(a);
                     return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
                 }
                 return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountByCreatedDate(createdDate), HttpStatus.OK);

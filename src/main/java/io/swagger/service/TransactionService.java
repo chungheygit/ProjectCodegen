@@ -155,34 +155,32 @@ public class TransactionService {
 
     public List<Transaction> getTransactionsByFilters(String iban, Integer offset, Integer limit, String startDate, String endDate){
 
-        LocalDate parsedStartDate;
-        LocalDate parsedEndDate;
+        //default values
+        LocalDate parsedStartDate=LocalDate.of(1900,01,01);;
+        LocalDate parsedEndDate=LocalDate.now();
 
         //if filters are not used. get
-        if(iban!=null || offset!=null || limit!=null || startDate!=null || endDate!=null){
-            if(startDate != null){
-                parsedStartDate = LocalDate.parse(startDate);
-            }
-            else{
-                parsedStartDate = LocalDate.of(1900,01,01);
-            }
-            if (endDate == null) {
-                parsedEndDate = LocalDate.now();
-            }
-            else{
-                parsedEndDate = LocalDate.parse(endDate);
-            }
-            if(iban!=null) {
+        if(iban!=null || offset!=null || limit!=null || startDate!=null || endDate!=null) {
+            if (startDate != null || endDate != null) {
+                if (startDate != null) {
+                    parsedStartDate = LocalDate.parse(startDate);
+                }
+                if (endDate != null) {
+                    parsedEndDate = LocalDate.parse(endDate);
+                }
+                if(iban==null) {
+                    return transactionRepository.getTransactionsByDay(parsedStartDate,parsedEndDate,limit,offset);
+                }
+            } else if (iban != null) {
                 //account ophalen
                 Account account = accountRepository.getAccountByIban(iban);
 
                 if (startDate == null) {
                     parsedStartDate = account.getCreatedDate();
                 }
+                return transactionRepository.getTransactionsByIban(iban, limit, offset);
             }
-            else{
-                //geen iban
-            }
+
             return transactionRepository.getTransactionsByFilters(iban, parsedStartDate, parsedEndDate, limit, offset );
         }
         else{

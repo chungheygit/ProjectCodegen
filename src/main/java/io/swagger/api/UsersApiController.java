@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,6 +41,8 @@ public class UsersApiController implements UsersApi {
         this.userService = userService;
     }
 
+    // CREATE A NEW USER
+    @PreAuthorize("hasRole('Employee')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody User body) {
         String accept = request.getHeader("Accept");
         //Create User
@@ -49,30 +53,31 @@ public class UsersApiController implements UsersApi {
         }
     }
 
+    // GET ALL USERS
     public ResponseEntity<List<User>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter users by email" ,schema=@Schema()) @Valid @RequestParam(value = "email", required = false) String email) {
+)) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter users by email" ,schema=@Schema()) @Valid @RequestParam(value = "email", required = false) String email) throws Exception {
         String accept = request.getHeader("Accept");
 
-        //Get all users
+        List<User> users = new ArrayList<User>();
         try {
-            //filter email
+            // GET ALL USERS BY MAIL
             if (email != null) {
                 User u = userService.findUserByEmail(email);
-                List<User> users = new ArrayList<User>();
+                //users = new ArrayList<User>();
                 if (u == null)
                     return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
                 users.add(u);
                 return new ResponseEntity<List<User>>(users, HttpStatus.OK);
             }
-            return new ResponseEntity<List<User>>(userService.getAllUsers(),HttpStatus.OK);
+            //RETURN USERS WITH OR WITHOUT LIMIT AND OFFSET
+            return new ResponseEntity<List<User>>(userService.getAllUsers(limit, offset), HttpStatus.OK);
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
-
     }
 
+    // GET A USER BY ITS ID
     public ResponseEntity<User> getUserById(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
 )) @PathVariable("userId") Integer userId) {
         String accept = request.getHeader("Accept");
