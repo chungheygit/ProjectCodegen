@@ -54,7 +54,12 @@ public class UserService {
         return allUsers;
  }
 
-    // Create a new User
+    // Get a user by its ID
+    public User getUserById (long id){ return userRepository.findById(id).get(); }
+
+    // Get all users by mail
+    public User findUserByEmail(String email) { return userRepository.findUserByEmail(email); }
+
     public User createUser (User user){
         if(userRepository.findUserByEmail(user.getEmail()) == null) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -64,12 +69,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Email/password invalid");
         }
     }
-
-    // Get a user by its ID
-    public User getUserById (long id){ return userRepository.findById(id).get(); }
-
-    // Get all users by mail
-    public User findUserByEmail(String email) { return userRepository.findUserByEmail(email); }
 
     public User updateUser(User targetUser) { return userRepository.save(targetUser); }
 
@@ -108,6 +107,7 @@ public class UserService {
         }
         return false;
     }
+
 
     /**
      * Apply Pagination
@@ -148,4 +148,5 @@ public class UserService {
 
         return allUsers;
     }
+
 }
