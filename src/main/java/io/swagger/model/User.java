@@ -4,16 +4,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.annotation.Validated;
+import org.threeten.bp.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Objects;
 
 /**
@@ -26,6 +29,7 @@ import java.util.Objects;
 
 public class User {
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   @JsonProperty("id")
   private Long id = null;
 
@@ -46,7 +50,7 @@ public class User {
 
   @JsonProperty("userType")
   @Valid
-  private UserTypeEnum userTypeEnum;
+  private UserType userTypeEnum;
 
   @JsonProperty("dayLimit")
   private BigDecimal dayLimit = null;
@@ -57,7 +61,7 @@ public class User {
   @JsonProperty("open")
   private Boolean open = null;
 
-  public User(Long id, String firstName, String lastName, LocalDate dateOfBirth, String email, String password, UserTypeEnum userTypeEnum, BigDecimal dayLimit, BigDecimal transactionLimit, Boolean open) {
+  public User(Long id, String firstName, String lastName, LocalDate dateOfBirth, String email, String password, UserType userTypeEnum, BigDecimal dayLimit, BigDecimal transactionLimit, Boolean open) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;
@@ -74,39 +78,6 @@ public class User {
   public User() {
   }
 
-  /**
-   * Gets or Sets userType
-   */
-  public enum UserTypeEnum {
-    CUSTOMER("customer"),
-    
-    EMPLOYEE("employee");
-
-    private String value;
-
-    UserTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static UserTypeEnum fromValue(String text) {
-      for (UserTypeEnum b : UserTypeEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
-
-
-
   public User id(Long id) {
     this.id = id;
     return this;
@@ -118,7 +89,7 @@ public class User {
    * @return id
    **/
   @Schema(description = "")
-  
+
   @Min(1L)  public Long getId() {
     return id;
   }
@@ -137,9 +108,9 @@ public class User {
    * @return firstName
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getFirstName() {
+  public String getFirstName() {
     return firstName;
   }
 
@@ -157,9 +128,9 @@ public class User {
    * @return lastName
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getLastName() {
+  public String getLastName() {
     return lastName;
   }
 
@@ -177,10 +148,10 @@ public class User {
    * @return dateOfBirth
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
-    public LocalDate getDateOfBirth() {
+  @Valid
+  public LocalDate getDateOfBirth() {
     return dateOfBirth;
   }
 
@@ -198,9 +169,9 @@ public class User {
    * @return email
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getEmail() {
+  public String getEmail() {
     return email;
   }
 
@@ -218,9 +189,9 @@ public class User {
    * @return password
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getPassword() {
+  public String getPassword() {
     return password;
   }
 
@@ -228,12 +199,12 @@ public class User {
     this.password = password;
   }
 
-  public User userType(UserTypeEnum userType) {
+  public User userType(UserType userType) {
     this.userTypeEnum = userType;
     return this;
   }
 
-  public User addUserTypeItem(UserTypeEnum userTypeItem) {
+  public User addUserTypeItem(UserType userTypeItem) {
     this.userTypeEnum = userTypeItem;
     return this;
   }
@@ -243,13 +214,13 @@ public class User {
    * @return userType
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public UserTypeEnum getUserType() {
+  public UserType getUserType() {
     return userTypeEnum;
   }
 
-  public void setUserType(UserTypeEnum userType) {
+  public void setUserType(UserType userType) {
     this.userTypeEnum = userType;
   }
 
@@ -264,9 +235,9 @@ public class User {
    * @return dayLimit
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
+  @Valid
   @DecimalMin("1")  public BigDecimal getDayLimit() {
     return dayLimit;
   }
@@ -286,9 +257,9 @@ public class User {
    * @return transactionLimit
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
+  @Valid
   @DecimalMin("1")  public BigDecimal getTransactionLimit() {
     return transactionLimit;
   }
@@ -307,9 +278,9 @@ public class User {
    * @return open
    **/
   @Schema(example = "false", required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public Boolean isOpen() {
+  public Boolean isOpen() {
     return open;
   }
 
@@ -328,15 +299,15 @@ public class User {
     }
     User user = (User) o;
     return Objects.equals(this.id, user.id) &&
-        Objects.equals(this.firstName, user.firstName) &&
-        Objects.equals(this.lastName, user.lastName) &&
-        Objects.equals(this.dateOfBirth, user.dateOfBirth) &&
-        Objects.equals(this.email, user.email) &&
-        Objects.equals(this.password, user.password) &&
-        Objects.equals(this.userTypeEnum, user.userTypeEnum) &&
-        Objects.equals(this.dayLimit, user.dayLimit) &&
-        Objects.equals(this.transactionLimit, user.transactionLimit) &&
-        Objects.equals(this.open, user.open);
+            Objects.equals(this.firstName, user.firstName) &&
+            Objects.equals(this.lastName, user.lastName) &&
+            Objects.equals(this.dateOfBirth, user.dateOfBirth) &&
+            Objects.equals(this.email, user.email) &&
+            Objects.equals(this.password, user.password) &&
+            Objects.equals(this.userTypeEnum, user.userTypeEnum) &&
+            Objects.equals(this.dayLimit, user.dayLimit) &&
+            Objects.equals(this.transactionLimit, user.transactionLimit) &&
+            Objects.equals(this.open, user.open);
   }
 
   @Override
@@ -348,7 +319,7 @@ public class User {
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class User {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    firstName: ").append(toIndentedString(firstName)).append("\n");
     sb.append("    lastName: ").append(toIndentedString(lastName)).append("\n");
