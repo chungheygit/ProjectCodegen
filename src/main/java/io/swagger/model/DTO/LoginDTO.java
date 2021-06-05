@@ -1,28 +1,27 @@
-package io.swagger.model;
+package io.swagger.model.DTO;
 
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.validation.annotation.Validated;
-import javax.validation.Valid;
+
 import javax.validation.constraints.*;
 
 /**
  * Login
  */
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-13T11:41:43.884Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
 
-public class Login   {
+public class LoginDTO {
   @JsonProperty("email")
   private String email = null;
 
   @JsonProperty("password")
   private String password = null;
 
-  public Login email(String email) {
+  public LoginDTO email(String email) {
     this.email = email;
     return this;
   }
@@ -42,7 +41,7 @@ public class Login   {
     this.email = email;
   }
 
-  public Login password(String password) {
+  public LoginDTO password(String password) {
     this.password = password;
     return this;
   }
@@ -71,9 +70,9 @@ public class Login   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Login login = (Login) o;
-    return Objects.equals(this.email, login.email) &&
-        Objects.equals(this.password, login.password);
+    LoginDTO loginDTO = (LoginDTO) o;
+    return Objects.equals(this.email, loginDTO.email) &&
+        Objects.equals(this.password, loginDTO.password);
   }
 
   @Override

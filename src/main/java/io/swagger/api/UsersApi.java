@@ -5,7 +5,7 @@
  */
 package io.swagger.api;
 
-import io.swagger.model.Login;
+import io.swagger.model.DTO.LoginDTO;
 import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,20 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 import java.util.List;
-import java.util.Map;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-13T11:41:43.884Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 @Validated
 public interface UsersApi {
 
@@ -56,24 +51,6 @@ public interface UsersApi {
     ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody User body);
 
 
-    @Operation(summary = "Delete the specified user", description = "Employee method deletes the user by userId", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "User successfully deleted"),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/users/{userId}",
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId);
-
-
     @Operation(summary = "Get a list of all the available users", description = "", security = {
         @SecurityRequirement(name = "bearerAuth")    }, tags={ "Users" })
     @ApiResponses(value = { 
@@ -91,7 +68,7 @@ public interface UsersApi {
         method = RequestMethod.GET)
     ResponseEntity<List<User>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions by email" ,schema=@Schema()) @Valid @RequestParam(value = "email", required = false) String email);
+)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter users by email" ,schema=@Schema()) @Valid @RequestParam(value = "email", required = false) String email);
 
 
     @Operation(summary = "Returns a specific user by id", description = "Employee method, or if customer requests own id", security = {
@@ -124,20 +101,7 @@ public interface UsersApi {
         produces = { "text/plain" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Login body);
-
-
-    @Operation(summary = "Logs a user out", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Authentication" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "User successfully logged out"),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/users/logout",
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> logoutUser();
+    ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO body);
 
 
     @Operation(summary = "Edit specified user information", description = "", security = {
@@ -156,7 +120,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
     ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId);
+)) @PathVariable("userId") Integer userId, @Valid @RequestBody User body);
 
 }
 

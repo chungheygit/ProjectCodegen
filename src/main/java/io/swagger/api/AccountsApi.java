@@ -6,7 +6,6 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
-import org.threeten.bp.LocalDate;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -30,10 +29,12 @@ import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-13T11:41:43.884Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 @Validated
 public interface AccountsApi {
 
@@ -54,23 +55,6 @@ public interface AccountsApi {
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
     ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Account body);
-
-
-    @Operation(summary = "Delete the specified account", description = "Employee Method, deletes the account with the specified IBAN.", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Account successfully deleted"),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/accounts/{iban}",
-        method = RequestMethod.DELETE)
-    ResponseEntity<Void> deleteAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban);
 
 
     @Operation(summary = "Get the specified account", description = "", security = {
@@ -108,7 +92,7 @@ public interface AccountsApi {
         method = RequestMethod.GET)
     ResponseEntity<List<Account>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) LocalDate createdDate);
+)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) LocalDate createdDate);
 
 
     @Operation(summary = "Update account details", description = "Employee Method, update details of the specified account", security = {

@@ -6,22 +6,31 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
+
+import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
+
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
  * Account
  */
+@Entity
 @Validated
-@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-13T11:41:43.884Z[GMT]")
+@javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
 
 public class Account   {
   @JsonProperty("userId")
   private Long userId = null;
 
+  @Id
   @JsonProperty("iban")
   private String iban = null;
 
@@ -29,47 +38,34 @@ public class Account   {
   private BigDecimal balance = new BigDecimal(0);
 
   @JsonProperty("createdDate")
-  private OffsetDateTime createdDate = null;
+  private java.time.LocalDate createdDate = null;
 
-  /**
-   * Gets or Sets accountType
-   */
-  public enum AccountTypeEnum {
-    CURRENT("current"),
-    
-    SAVINGS("savings");
-
-    private String value;
-
-    AccountTypeEnum(String value) {
-      this.value = value;
-    }
-
-    @Override
-    @JsonValue
-    public String toString() {
-      return String.valueOf(value);
-    }
-
-    @JsonCreator
-    public static AccountTypeEnum fromValue(String text) {
-      for (AccountTypeEnum b : AccountTypeEnum.values()) {
-        if (String.valueOf(b.value).equals(text)) {
-          return b;
-        }
-      }
-      return null;
-    }
-  }
+  @Enumerated(EnumType.STRING)
   @JsonProperty("accountType")
-  private AccountTypeEnum accountType = null;
+  private AccountType accountType = null;
 
   @JsonProperty("absoluteLimit")
   private BigDecimal absoluteLimit = null;
 
+  @JsonProperty("open")
+  private Boolean open = null;
+
   public Account userId(Long userId) {
     this.userId = userId;
     return this;
+  }
+
+  public Account(Long userId, String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
+    this.userId = userId;
+    this.iban = iban;
+    this.balance = balance;
+    this.createdDate = createdDate;
+    this.accountType = accountType;
+    this.absoluteLimit = absoluteLimit;
+    this.open = open;
+  }
+
+  public Account() {
   }
 
   /**
@@ -129,7 +125,7 @@ public class Account   {
     this.balance = balance;
   }
 
-  public Account createdDate(OffsetDateTime createdDate) {
+  public Account createdDate(java.time.LocalDate createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -142,15 +138,15 @@ public class Account   {
       @NotNull
 
     @Valid
-    public OffsetDateTime getCreatedDate() {
+    public java.time.LocalDate getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(OffsetDateTime createdDate) {
+  public void setCreatedDate(java.time.LocalDate createdDate) {
     this.createdDate = createdDate;
   }
 
-  public Account accountType(AccountTypeEnum accountType) {
+  public Account accountType(AccountType accountType) {
     this.accountType = accountType;
     return this;
   }
@@ -162,11 +158,11 @@ public class Account   {
   @Schema(required = true, description = "")
       @NotNull
 
-    public AccountTypeEnum getAccountType() {
+    public AccountType getAccountType() {
     return accountType;
   }
 
-  public void setAccountType(AccountTypeEnum accountType) {
+  public void setAccountType(AccountType accountType) {
     this.accountType = accountType;
   }
 
@@ -191,6 +187,26 @@ public class Account   {
     this.absoluteLimit = absoluteLimit;
   }
 
+  public Account open(Boolean open) {
+    this.open = open;
+    return this;
+  }
+
+  /**
+   * Get open
+   * @return open
+   **/
+  @Schema(example = "false", required = true, description = "")
+      @NotNull
+
+    public Boolean isOpen() {
+    return open;
+  }
+
+  public void setOpen(Boolean open) {
+    this.open = open;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -206,12 +222,13 @@ public class Account   {
         Objects.equals(this.balance, account.balance) &&
         Objects.equals(this.createdDate, account.createdDate) &&
         Objects.equals(this.accountType, account.accountType) &&
-        Objects.equals(this.absoluteLimit, account.absoluteLimit);
+        Objects.equals(this.absoluteLimit, account.absoluteLimit) &&
+        Objects.equals(this.open, account.open);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(userId, iban, balance, createdDate, accountType, absoluteLimit);
+    return Objects.hash(userId, iban, balance, createdDate, accountType, absoluteLimit, open);
   }
 
   @Override
@@ -225,6 +242,7 @@ public class Account   {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    accountType: ").append(toIndentedString(accountType)).append("\n");
     sb.append("    absoluteLimit: ").append(toIndentedString(absoluteLimit)).append("\n");
+    sb.append("    open: ").append(toIndentedString(open)).append("\n");
     sb.append("}");
     return sb.toString();
   }
