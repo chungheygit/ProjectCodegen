@@ -2,8 +2,12 @@ package io.swagger.service;
 
 import io.swagger.model.DTO.LoginDTO;
 import io.swagger.model.User;
+import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
+import io.swagger.security.MyUserDetailsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,11 +25,17 @@ public class UserService {
 
     UserRepository userRepository;
     @Autowired
+    AccountService accountService;
+    @Autowired
+    MyUserDetailsService myUserDetailsService;
+    @Autowired
     private AuthenticationManager authenticationManager;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
     public UserService(UserRepository userRepository) {
 

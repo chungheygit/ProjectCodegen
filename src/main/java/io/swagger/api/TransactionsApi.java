@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.annotations.ApiParam;
+import io.swagger.model.DTO.TransactionDTO;
 import io.swagger.model.Transaction;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,42 +36,41 @@ import java.util.Map;
 public interface TransactionsApi {
 
     @Operation(summary = "Creates a transaction", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Transaction successfully created", content = @Content(schema = @Schema(implementation = Transaction.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-    @RequestMapping(value = "/transactions/{iban}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
-    ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Transaction body);
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Transaction successfully created", content = @Content(schema = @Schema(implementation = Transaction.class))),
 
+            @ApiResponse(responseCode = "400", description = "Invalid input given"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
+    @RequestMapping(value = "/transactions/",
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
+    ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionDTO transactionDTO);
 
     @Operation(summary = "Returns all transactions", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "All transactions are successfully returned", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Transaction.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "All transactions are successfully returned", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Transaction.class)))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input given"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(value = "/transactions",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
-    ResponseEntity<List<Transaction>> getAllTransactions(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) LocalDate startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) LocalDate endDateTime);
+            produces = { "application/json" },
+            method = RequestMethod.GET)
+    ResponseEntity<List<Transaction>> getAllTransactions(@Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) String startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) String endDateTime);
 
 
     @Operation(summary = "Returns a transaction by id", description = "", tags={ "Transactions" })
