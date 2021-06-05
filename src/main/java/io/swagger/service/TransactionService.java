@@ -1,7 +1,9 @@
 package io.swagger.service;
 
+
 import io.swagger.model.*;
 import io.swagger.model.DTO.TransactionDTO;
+
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
@@ -16,10 +18,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class TransactionService {
@@ -40,12 +40,7 @@ public class TransactionService {
         this.accountService = accountService;
     }
     public List<Transaction> getAllTransactions() {
-        return transactionRepository.findAll();
-    }
-
-    public Transaction getTransactionById (Integer transactionId) throws IllegalArgumentException{
-        Optional<Transaction> optional = transactionRepository.findById(transactionId);
-        return optional.orElseThrow(IllegalArgumentException::new);
+        return (List<Transaction>) transactionRepository.findAll();
     }
 
     public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception{
@@ -181,6 +176,7 @@ public class TransactionService {
 //    public List<Transaction> getFilteredTransaction(Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
 //        return transactionRepository.getFilteredTransactions(offset,limit,startDate,endDate);
 //    }
+
 
 
 }

@@ -2,16 +2,12 @@ package io.swagger.repository;
 
 import io.swagger.model.Transaction;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import org.threeten.bp.OffsetDateTime;
-
-import java.time.LocalDate;
-import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
+
     @Query(value = "SELECT * FROM Transaction WHERE timestamp BETWEEN ?2 AND ?3 AND  Id IN ( SELECT Id FROM Transaction WHERE SENDER = ?1 OR RECEIVER = ?1) limit ?4 offset ?5", nativeQuery = true)
     List<Transaction> getTransactionsByFilters(String iban, LocalDate startDate, LocalDate endDate, Integer limit, Integer offset);
 
@@ -27,5 +23,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     //List<Transaction> getTransactionsByFilters(Integer offset, Integer limit, LocalDate startDateTime, LocalDate endDateTime);
 
     //SELECT * FROM Transaction WHERE timestamp BETWEEN '2020-12-12 ' AND '2021-06-05' AND ID IN ( SELECT ID FROM TRANSACTION WHERE SENDER = 'NL58INHO0123456788' OR RECEIVER = 'NL58INHO0123456788')
+
 
 }

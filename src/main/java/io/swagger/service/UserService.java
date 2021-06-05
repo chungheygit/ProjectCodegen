@@ -1,6 +1,5 @@
 package io.swagger.service;
 
-import io.swagger.model.DTO.LoginDTO;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
@@ -14,11 +13,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Arrays;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -34,6 +33,7 @@ public class UserService {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private PasswordEncoder passwordEncoder;
+
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
@@ -51,18 +51,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User createUser (User user){
-        if(userRepository.findUserByEmail(user.getEmail()) == null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return userRepository.save(user);
-        }
-        else{
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Email/password invalid");
-        }
-    }
-
+    public User createUser (User user){ return userRepository.save(user);}
 
     public User getUserById (long id){ return userRepository.findById(id).get(); }
+
 
     public User updateUser(User targetUser) { return userRepository.save(targetUser); }
 

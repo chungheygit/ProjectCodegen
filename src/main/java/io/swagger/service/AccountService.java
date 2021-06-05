@@ -3,7 +3,6 @@ package io.swagger.service;
 import io.swagger.api.UsersApiController;
 import io.swagger.model.Account;
 import io.swagger.model.User;
-import io.swagger.model.UserType;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.MyUserDetailsService;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,35 +45,31 @@ public class AccountService {
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
     }
-    public Account getAccountByCreatedDate(LocalDate date){
-        if(date == null)
+    public List<Account> getAccountByCreatedDate(java.time.LocalDate date, Integer offset, Integer limit){
+        if(date == null || offset == null || limit == null)
         {
-            date = LocalDate.now();
+            date = java.time.LocalDate.now();
+            offset= 0;
+            limit = 5;
         }
 
-        return accountRepository.getAccountByCreatedDate(date);
+        return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
     }
     public Account updateAccount(Account account) throws Exception
     {
-        User user = userService.getUserById(account.getUserId());
 
         String Iban = account.getIban();
         if (Iban == null)
         {
             throw new Exception("Account does not exist");
         }
-        else if (Iban != null && user.getUserType() == UserType.ROLE_CUSTOMER)
-        {
-            throw new Exception("No access for customers to update account details");
-        }
+
         return  accountRepository.save(account);
 
     }
-
     public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
         return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
     }
-
 
     public Account getAccountByIban(String iban) throws Exception {
         Account account = accountRepository.getAccountByIban(iban);
@@ -95,6 +91,7 @@ public class AccountService {
     }
 
     public Account createAccount(Account account){
+
          return accountRepository.save(account);
     }
 
@@ -114,14 +111,17 @@ public class AccountService {
      //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
    // }
 
-    protected void addToBalance(Account account, BigDecimal amount){
+
+    protected void addToBalance(Account account, BigDecimal amount){ 
         BigDecimal newBalance = amount.add(account.getBalance());
         account.setBalance(newBalance);
         accountRepository.save(account);
+
     }
 
     protected void subtractFromBalance(Account account, BigDecimal amount){
-        account.setBalance(account.getBalance().subtract(amount));
+        BigDecimal newBalance = amount.subtract(account.getBalance());
+        account.setBalance(newBalance);
         accountRepository.save(account);
     }
 
