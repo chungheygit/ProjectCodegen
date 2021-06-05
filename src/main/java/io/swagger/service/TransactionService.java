@@ -1,7 +1,14 @@
 package io.swagger.service;
 
+<<<<<<< HEAD
 import io.swagger.model.*;
 import io.swagger.model.DTO.TransactionDTO;
+=======
+
+import io.swagger.model.*;
+import io.swagger.model.DTO.TransactionDTO;
+
+>>>>>>> Dev2.0
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
@@ -182,5 +189,9 @@ public class TransactionService {
 //        return transactionRepository.getFilteredTransactions(offset,limit,startDate,endDate);
 //    }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Dev2.0
 
 }

@@ -40,6 +40,10 @@ public class TransactionsApiController implements TransactionsApi {
 
     private TransactionService transactionService;
     private AccountService accountService;
+<<<<<<< HEAD
+=======
+
+>>>>>>> Dev2.0
 
     @org.springframework.beans.factory.annotation.Autowired
     public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service, AccountService accountService) {
