@@ -101,7 +101,7 @@ public interface UsersApi {
         produces = { "text/plain" }, 
         consumes = { "application/json" }, 
         method = RequestMethod.POST)
-    ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO body);
+    ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO);
 
 
     @Operation(summary = "Edit specified user information", description = "", security = {
