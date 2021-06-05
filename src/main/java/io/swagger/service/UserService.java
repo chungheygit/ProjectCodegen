@@ -32,14 +32,23 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User findUserByEmail(String email)
-    {
-        return userRepository.findUserByEmail(email);
-    }
+    // Get all users (With limit en offset)
+    public List<User> getAllUsers(Integer limit, Integer offset) throws Exception {
+        List<User> allUsers = userRepository.findAll();
 
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
-    }
+        if(allUsers.size() == 0){   	return allUsers;       } //No users found
+
+        //apply pagination with/to offset and limit
+        allUsers = createPageable(offset, limit, allUsers);
+
+        return allUsers;
+ }
+
+    // Get a user by its ID
+    public User getUserById (long id){ return userRepository.findById(id).get(); }
+
+    // Get all users by mail
+    public User findUserByEmail(String email) { return userRepository.findUserByEmail(email); }
 
     public User createUser (User user){
         if(userRepository.findUserByEmail(user.getEmail()) == null) {
@@ -50,9 +59,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Email/password invalid");
         }
     }
-
-
-    public User getUserById (long id){ return userRepository.findById(id).get(); }
 
     public User updateUser(User targetUser) { return userRepository.save(targetUser); }
 
@@ -68,4 +74,69 @@ public class UserService {
         }
 
     }
+
+    public Boolean IsLoggedInUserEmployee(){
+        User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
+        if(currentUser.getUserType() == UserType.ROLE_EMPLOYEE){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public Boolean IsIbanFromLoggedInUser(String iban){
+        boolean isIbanFromLoggedInUser;
+        User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
+        try{
+            if(accountService.getAccountByIban(iban).getUserId() == currentUser.getId()){
+                return true;
+            }
+        }catch (Exception e){
+            log.error("Exception: " + e);
+        }
+        return false;
+    }
+
+
+    /**
+     * Apply Pagination
+     * @param offset
+     * @param limit
+     * @param allUsers
+     * @return
+     * @throws Exception
+     */
+    private List<User> createPageable(Integer offset, Integer limit, List<User> allUsers) throws Exception{
+
+        if(limit == null && offset == null){
+            // No pagination
+            return allUsers;
+        }
+
+        int size = allUsers.size();
+        if (offset == null) {
+            offset = 0;
+        }
+        if (limit == null) {
+            limit = size;
+        }
+        if (limit <= 0) {
+            throw new Exception("limit can't be zero or negative");
+        }
+
+        if (offset < 0) {
+            throw new Exception("offset can't be  negative");
+        }
+
+        limit = offset + limit ;
+
+        if(limit > size) { limit  = size;}
+        if(offset > size){ offset = size;}
+
+        allUsers= allUsers.subList(offset, limit);
+
+        return allUsers;
+    }
+
 }
