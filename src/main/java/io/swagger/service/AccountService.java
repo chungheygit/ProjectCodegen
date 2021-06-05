@@ -32,6 +32,8 @@ public class AccountService {
     @Autowired
     UserService userService;
 
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
+
 
     // List of all IBANs saved to just use any IBAN one time
     ArrayList<String> usedIBANs;
@@ -79,6 +81,7 @@ public class AccountService {
         Account account = accountRepository.getAccountByIban(iban);
 
         if(account==null){
+            log.error("Attempting to get non-existing account");
             throw new Exception("Account does not exist");
         }
         return account;
@@ -87,6 +90,7 @@ public class AccountService {
     //makes sure a customer can only retrieve his own accounts
     public Account getAccountByIbanWithSecurity(String iban) throws Exception {
         if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+            log.error("User not authorized");
             throw new Exception("User not authorized");
         }
         else{
@@ -115,8 +119,7 @@ public class AccountService {
    // }
 
     protected void addToBalance(Account account, BigDecimal amount){
-        BigDecimal newBalance = amount.add(account.getBalance());
-        account.setBalance(newBalance);
+        account.setBalance(amount.add(account.getBalance()));
         accountRepository.save(account);
     }
 

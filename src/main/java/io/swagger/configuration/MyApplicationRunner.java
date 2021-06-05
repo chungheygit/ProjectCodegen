@@ -47,10 +47,10 @@ public class MyApplicationRunner implements ApplicationRunner {
         ////bank moet account hebben
 
         // Create users
-        User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio@test.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), true);
-        User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio@test2.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), true);
-        User user3 = new User(3L, "test", "test", LocalDate.of(2021,12,20), "cus","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
-        User user4 = new User(4L, "test", "test", LocalDate.of(2021,12,20), "emp","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio@test.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("1000.02"), new BigDecimal("250.02"), true);
+        User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio@test2.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.02"), new BigDecimal("250.02"), true);
+        User user3 = new User(3L, "test", "test", LocalDate.of(2021,12,20), "cus","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.02"), new BigDecimal("250.02"), false);
+        User user4 = new User(4L, "test", "test", LocalDate.of(2021,12,20), "emp","password", UserType.ROLE_EMPLOYEE, new BigDecimal("1000.02"), new BigDecimal("250.02"), false);
 
         userService.createUser(user1);
         userService.createUser(user2);

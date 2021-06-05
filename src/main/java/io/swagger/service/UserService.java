@@ -74,7 +74,7 @@ public class UserService {
 
             return "Bearer " + jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
         }catch (AuthenticationException exception){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "email/password invalid");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Wrong email/password");
         }
 
     }
@@ -90,7 +90,6 @@ public class UserService {
     }
 
     public Boolean IsIbanFromLoggedInUser(String iban){
-        boolean isIbanFromLoggedInUser;
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
         try{
             if(accountService.getAccountByIban(iban).getUserId() == currentUser.getId()){

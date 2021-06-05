@@ -7,6 +7,8 @@ import io.swagger.repository.TransactionRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.MyUserDetailsService;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -33,6 +35,8 @@ public class TransactionService {
     private UserRepository userRepository;
     @Autowired
     private MyUserDetailsService myUserDetailsService;
+
+    private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
 
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, AccountService accountService) {
         this.transactionRepository = transactionRepository;
@@ -73,6 +77,9 @@ public class TransactionService {
         accountService.addToBalance(receiverAccount, transaction.getAmount());
         accountService.subtractFromBalance(senderAccount, transaction.getAmount());
 
+        System.out.println("Sender: " + senderAccount.getBalance() + " receiver: " + receiverAccount.getBalance() );
+
+        log.info("Transaction successfully created");
         return transactionRepository.save(transaction);
     }
 
@@ -80,6 +87,7 @@ public class TransactionService {
         if(sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS)
         {
             if(!sender.getUserId().equals(receiver.getUserId())){
+                log.error("User tried transfering to/from savings account from other user");
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden to transfer from/to savings account from another user.");
             }
             else{
@@ -101,6 +109,7 @@ public class TransactionService {
         if(!userService.IsLoggedInUserEmployee()){
             //check if user is sender
             if(!userPerforming.getId().equals(senderUser.getId())){
+                log.error("User not employee, and not the owner of sending account");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the sender");
             }
         }
@@ -108,12 +117,14 @@ public class TransactionService {
 
     private void checkIfAccountsAreTheSame(Account sender, Account receiver){
         if(sender == receiver){
+            log.error("User tried sending money to same account");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't send money to same account");
         }
     }
 
     private void checkIfAccountsAreOpen(Account sender, Account receiver){
         if(!sender.isOpen() || !receiver.isOpen()){
+            log.error("User tried sending money to a closed account");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't transfer to/from closed accounts");
         }
     }
@@ -121,6 +132,7 @@ public class TransactionService {
     private void checkLimits(Transaction transaction, Account senderAccount, User senderUser){
         //transactionlimit
         if(transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()){
+            log.error("User exceed transaction limit");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded transaction limit");
         }
 
@@ -130,11 +142,13 @@ public class TransactionService {
             spentMoneyToday = 0.00;
         }
         if(spentMoneyToday > senderUser.getDayLimit().doubleValue()){
+            log.error("User exceeded day limit");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded day limit");
         }
 
         //balance limit
         if(senderAccount.getBalance().doubleValue() - transaction.getAmount().doubleValue() < senderAccount.getAbsoluteLimit().doubleValue()){
+            log.error("Account balance too low");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
         }
     }
