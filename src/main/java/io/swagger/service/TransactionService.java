@@ -1,11 +1,18 @@
 package io.swagger.service;
 
-import io.swagger.model.Account;
-import io.swagger.model.AccountType;
-import io.swagger.model.Transaction;
+import io.swagger.model.*;
+import io.swagger.model.DTO.TransactionDTO;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.TransactionRepository;
+import io.swagger.repository.UserRepository;
+import io.swagger.security.MyUserDetailsService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.PermissionDeniedDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
 import java.math.BigDecimal;
@@ -20,6 +27,12 @@ public class TransactionService {
     private TransactionRepository transactionRepository;
     private AccountRepository accountRepository;
     private AccountService accountService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private MyUserDetailsService myUserDetailsService;
 
     public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, AccountService accountService) {
         this.transactionRepository = transactionRepository;
@@ -35,41 +48,103 @@ public class TransactionService {
         return optional.orElseThrow(IllegalArgumentException::new);
     }
 
-    public Transaction createTransaction(Transaction transaction) throws Exception{
+    public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception{
 
-        Account sender = accountService.getAccountByIban(transaction.getSender());
-        Account receiver = accountService.getAccountByIban(transaction.getReceiver());
+        ModelMapper modelMapper = new ModelMapper();
+        Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
 
+        Account senderAccount = accountService.getAccountByIban(transaction.getSender());
+        User senderUser = userRepository.getOne(senderAccount.getUserId());
+        Account receiverAccount = accountService.getAccountByIban(transaction.getReceiver());
+        User userPerforming = userService.findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
+
+        //checks
+        checkIfAccountsAreTheSame(senderAccount, receiverAccount);
+        checkIfAccountsAreOpen(senderAccount, receiverAccount);
+        checkIfUserPerformingIsPermitted(userPerforming, senderUser);
+        checkLimits(transaction, senderAccount, senderUser);
+
+        //filling properties
+        transaction.setTransactionType(checkTransactionType(senderAccount, receiverAccount));
+        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setUserPerforming(userPerforming.getId().intValue());
+
+        //updating balance
+        accountService.addToBalance(receiverAccount, transaction.getAmount());
+        accountService.subtractFromBalance(senderAccount, transaction.getAmount());
+
+        return transactionRepository.save(transaction);
+    }
+
+    private TransactionType checkTransactionType(Account sender, Account receiver){
         if(sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS)
         {
             if(!sender.getUserId().equals(receiver.getUserId())){
-                throw new Exception("Forbidden to transfer from/to savings account from another user.");
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden to transfer from/to savings account from another user.");
             }
             else{
                 if(sender.getAccountType() == AccountType.SAVINGS){
-                    transaction.setDescription("WITHDRAWAL - " + transaction.getDescription());
+                    return TransactionType.WITHDRAWAL;
                 }
                 else{
-                    transaction.setDescription("DEPOSIT - " + transaction.getDescription());
+                    return TransactionType.DEPOSIT;
                 }
             }
         }
-        //check limits!!!!!
+        else{
+            return TransactionType.TRANSACTION;
+        }
+    }
 
-        transaction.setTimestamp(LocalDateTime.now());
-        //userPerforming!!!!!!!
-        accountService.addToBalance(receiver, transaction.getAmount());
-        accountService.subtractFromBalance(sender, transaction.getAmount());
+    private void checkIfUserPerformingIsPermitted(User userPerforming, User senderUser){
+        //check if user is employee
+        if(!userService.IsLoggedInUserEmployee()){
+            //check if user is sender
+            if(!userPerforming.getId().equals(senderUser.getId())){
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the sender");
+            }
+        }
+    }
 
-        accountRepository.save(receiver);
-        accountRepository.save(sender);
-        return transactionRepository.save(transaction);
+    private void checkIfAccountsAreTheSame(Account sender, Account receiver){
+        if(sender == receiver){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't send money to same account");
+        }
+    }
+
+    private void checkIfAccountsAreOpen(Account sender, Account receiver){
+        if(!sender.isOpen() || !receiver.isOpen()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't transfer to/from closed accounts");
+        }
+    }
+
+    private void checkLimits(Transaction transaction, Account senderAccount, User senderUser){
+        //transactionlimit
+        if(transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded transaction limit");
+        }
+
+        //daylimit
+        Double spentMoneyToday = transactionRepository.getSpentMoneyByDate(senderAccount.getIban(), LocalDate.now());
+        if(spentMoneyToday==null){
+            spentMoneyToday = 0.00;
+        }
+        if(spentMoneyToday > senderUser.getDayLimit().doubleValue()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded day limit");
+        }
+
+        //balance limit
+        if(senderAccount.getBalance().doubleValue() - transaction.getAmount().doubleValue() < senderAccount.getAbsoluteLimit().doubleValue()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
+        }
     }
 
     public List<Transaction> getTransactionsByIban(String iban, Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
 
         return transactionRepository.getTransactionsByIban(offset, limit, startDate, endDate,iban);
     }
+
+
 //    public List<Transaction> getFilteredTransaction(Integer offset, Integer limit, LocalDate startDate, LocalDate endDate){
 //        return transactionRepository.getFilteredTransactions(offset,limit,startDate,endDate);
 //    }

@@ -79,7 +79,7 @@ public class UserService {
 
     }
 
-    public boolean IsLoggedInUserEmployee(){
+    public Boolean IsLoggedInUserEmployee(){
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
         if(currentUser.getUserType() == UserType.ROLE_EMPLOYEE){
             return true;
@@ -89,7 +89,7 @@ public class UserService {
         }
     }
 
-    public boolean IsIbanFromLoggedInUser(String iban){
+    public Boolean IsIbanFromLoggedInUser(String iban){
         boolean isIbanFromLoggedInUser;
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
         try{

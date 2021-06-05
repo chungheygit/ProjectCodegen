@@ -3,14 +3,10 @@ package io.swagger.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -30,7 +26,6 @@ public class Transaction   {
   @JsonProperty("id")
   private Integer id = null;
 
-  //@ManyToOne()
   @JsonProperty("userPerforming")
   private Integer userPerforming = null;
 
