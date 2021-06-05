@@ -41,4 +41,5 @@ public class MyUserDetailsService implements UserDetailsService {
     public UserDetails getLoggedInUser(){
         return (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
+
 }

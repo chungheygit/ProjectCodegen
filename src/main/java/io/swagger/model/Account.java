@@ -1,5 +1,7 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
