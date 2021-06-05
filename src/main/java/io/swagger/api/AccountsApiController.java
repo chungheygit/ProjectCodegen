@@ -2,8 +2,8 @@ package io.swagger.api;
 
 import io.swagger.model.Account;
 import io.swagger.model.DTO.AccountDTO;
-import io.swagger.model.User;
 import io.swagger.service.AccountService;
+import io.swagger.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,9 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -41,18 +38,24 @@ public class AccountsApiController implements AccountsApi {
 
     private final AccountService accountService;
 
+    private final UserService userService;
+
     @org.springframework.beans.factory.annotation.Autowired
-    public AccountsApiController(ObjectMapper objectMapper, HttpServletRequest request, AccountService accountService) {
+    public AccountsApiController(ObjectMapper objectMapper, HttpServletRequest request, AccountService accountService, UserService userService) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.accountService = accountService;
+        this.userService = userService;
     }
 
-    @PreAuthorize("hasRole('Employee')")
+
     public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody AccountDTO accountDTO) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+                if(!userService.IsLoggedInUserEmployee()) {
+                    return new ResponseEntity<Account>(HttpStatus.UNAUTHORIZED);
+                }
                 return new ResponseEntity<Account>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
@@ -77,13 +80,16 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<Account>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @PreAuthorize("hasRole('Employee')")
+
     public ResponseEntity<List<Account>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate createdDate) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+                if(!userService.IsLoggedInUserEmployee()) {
+                    return new ResponseEntity<List<Account>>(HttpStatus.UNAUTHORIZED);
+                }
                 if(createdDate != null)
                 {
                     List<Account> a = accountService.getAccountByCreatedDate(createdDate, offset, limit);
@@ -101,11 +107,13 @@ public class AccountsApiController implements AccountsApi {
         return new ResponseEntity<List<Account>>(HttpStatus.NOT_IMPLEMENTED);
     }
 
-    @PreAuthorize("hasRole('Employee')")
     public ResponseEntity<Account> updateAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Account body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
+                if(!userService.IsLoggedInUserEmployee()) {
+                    return new ResponseEntity<Account>(HttpStatus.UNAUTHORIZED);
+                }
                 return new ResponseEntity<Account>(accountService.updateAccount(body), HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
