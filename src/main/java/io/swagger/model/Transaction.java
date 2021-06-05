@@ -3,14 +3,10 @@ package io.swagger.model;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.*;
@@ -24,14 +20,12 @@ import javax.validation.constraints.*;
 @Validated
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
 
-@NoArgsConstructor
 public class Transaction   {
   @Id
   @GeneratedValue
   @JsonProperty("id")
   private Integer id = null;
 
-  //@ManyToOne()
   @JsonProperty("userPerforming")
   private Integer userPerforming = null;
 
@@ -51,6 +45,18 @@ public class Transaction   {
   @JsonProperty("description")
   private String description = null;
 
+  public TransactionType getTransactionType() {
+    return transactionType;
+  }
+
+  public void setTransactionType(TransactionType transactionType) {
+    this.transactionType = transactionType;
+  }
+
+  @Enumerated(EnumType.STRING)
+  @JsonProperty("transactionType")
+  private TransactionType transactionType = null;
+
   public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
     this.userPerforming = userPerforming;
     this.timestamp = timestamp;
@@ -63,6 +69,21 @@ public class Transaction   {
   public Transaction id(Integer id) {
     this.id = id;
     return this;
+  }
+
+  public Transaction ( /*Integer userPerform... door Abdelkhalak, Yassine
+
+Abdelkhalak, Yassine13:51
+public Transaction(/*Integer userPerforming, */ String sender, String receiver, BigDecimal amount, String description) {
+    //this.userPerforming = userPerforming;
+    this.timestamp = LocalDateTime.now();
+    this.sender = sender;
+    this.receiver = receiver;
+    this.amount = amount;
+    this.description = description;
+  }
+
+  public Transaction() {
   }
 
   /**
