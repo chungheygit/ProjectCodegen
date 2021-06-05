@@ -1,7 +1,6 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
-import io.swagger.model.User;
 import io.swagger.service.AccountService;
 import org.threeten.bp.LocalDate;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,7 +20,6 @@ import javax.validation.constraints.*;
 import javax.validation.Valid;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @javax.annotation.Generated(value = "io.swagger.codegen.v3.generators.java.SpringCodegen", date = "2021-05-17T13:44:26.622Z[GMT]")
@@ -61,7 +59,7 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<Account>(accountService.getAccountByIbanWithSecurity(iban), HttpStatus.OK);
+                return new ResponseEntity<Account>(accountService.getAccountByIban(iban), HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<Account>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -77,16 +75,7 @@ public class AccountsApiController implements AccountsApi {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                if(createdDate != null)
-                {
-                    Account a = accountService.getAccountByCreatedDate(LocalDate.parse(createdDate.toString()));
-                    List<Account> accounts = new ArrayList<>();
-                    if (a == null)
-                        return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-                     accounts.add(a);
-                    return new ResponseEntity<List<Account>>(accounts, HttpStatus.OK);
-                }
-                return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountByCreatedDate(createdDate), HttpStatus.OK);
+                return new ResponseEntity<List<Account>>(accountService.GetAllAccounts(), HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<List<Account>>(HttpStatus.INTERNAL_SERVER_ERROR);

@@ -1,9 +1,6 @@
 package io.swagger.api;
 
-
-import io.swagger.model.DTO.TransactionDTO;
-import io.swagger.model.Account;
-import io.swagger.service.AccountService;
+import io.swagger.annotations.ApiParam;
 import io.swagger.service.TransactionService;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -39,36 +36,45 @@ public class TransactionsApiController implements TransactionsApi {
     private final HttpServletRequest request;
 
     private TransactionService transactionService;
-    private AccountService accountService;
 
     @org.springframework.beans.factory.annotation.Autowired
-    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service, AccountService accountService) {
+    public TransactionsApiController(ObjectMapper objectMapper, HttpServletRequest request, TransactionService service) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.transactionService = service;
-        this.accountService=accountService;
     }
 
-    public ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionDTO transactionDTO) {
-        try {
-            return new ResponseEntity<Transaction>(transactionService.createTransaction(transactionDTO), HttpStatus.CREATED);
-        } catch (Exception e) {
-            log.error("Caught exception: ", e);
-            return new ResponseEntity<Transaction>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public ResponseEntity<List<Transaction>> getAllTransactions(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-    )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-    )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) String startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) String endDateTime) {
+    public ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Transaction body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByFilters(iban, offset, limit, startDateTime, endDateTime), HttpStatus.OK);
+                return new ResponseEntity<Transaction>(transactionService.createTransaction(body),	HttpStatus.CREATED);
+            } catch (Exception e) {
+                log.error("Couldn't serialize response for content type application/json", e);
+                return new ResponseEntity<Transaction>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
 
+        return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+    public ResponseEntity<List<Transaction>> getAllTransactions(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(description = "The IBAN number as string") @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0) @Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) LocalDate startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) LocalDate endDateTime) {
+        String accept = request.getHeader("Accept");
+        if (accept != null && accept.contains("application/json")) {
+            try {
+//                if(offset==null && limit==null && startDateTime==null && endDateTime==null){
+//                    return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
+//                }
+//                else{
+//                    return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByIban(iban,offset, limit, startDateTime, endDateTime), HttpStatus.OK);
+//                }
+                return new ResponseEntity<List<Transaction>>(transactionService.getAllTransactions(), HttpStatus.OK);
+                //return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByIban(iban,offset, limit, startDateTime, endDateTime), HttpStatus.OK);
             } catch (IllegalArgumentException e) {
                 log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<List<Transaction>>(HttpStatus.INTERNAL_SERVER_ERROR);
             }
         }
 
@@ -88,7 +94,7 @@ public class TransactionsApiController implements TransactionsApi {
 
         return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
     }
-
+//
 //    public ResponseEntity<List<Transaction>> getTransactionsByIban(
 //            @Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,
 //            @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }))
