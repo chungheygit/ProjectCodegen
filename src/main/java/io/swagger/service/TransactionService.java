@@ -71,7 +71,7 @@ public class TransactionService {
         //filling properties
         transaction.setTransactionType(checkTransactionType(senderAccount, receiverAccount));
         transaction.setTimestamp(LocalDateTime.now());
-        transaction.setUserPerforming(userPerforming.getId().intValue());
+        transaction.setUserPerforming(userPerforming.getId());
 
         //updating balance
         accountService.addToBalance(receiverAccount, transaction.getAmount());
