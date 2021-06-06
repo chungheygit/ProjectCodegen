@@ -116,17 +116,16 @@ public class AccountService {
         tenDigit3 = String.format("%02d", random.nextInt(100));
         return prefix1 + twoDigit  + prefix2  + tenDigit1  + tenDigit2  + tenDigit3;
     }
-   // public Boolean ibanExists(String IBAN){
-     //   return accountRepository.findById(IBAN).isPresent() || usedIBANs.contains(IBAN);
-   // }
 
 
     protected void addToBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().add(amount));
+        accountRepository.save(account);
     }
 
     protected void subtractFromBalance(Account account, BigDecimal amount){
-
+        account.setBalance(account.getBalance().subtract(amount));
+        accountRepository.save(account);
     }
 }
 

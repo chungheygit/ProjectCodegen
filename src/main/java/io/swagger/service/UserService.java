@@ -62,12 +62,6 @@ public class UserService {
             .orElseThrow(() ->  new IllegalArgumentException());
     }
 
-//    public User getUserById (long id) {
-//        return userRepository
-//                .findById(id)
-//                .orElseThrow(() ->  new IllegalArgumentException());
-//    }
-
     // Get all users by mail
     public User findUserByEmail(String email) { return userRepository.findUserByEmail(email); }
 
@@ -107,7 +101,6 @@ public class UserService {
     }
 
     public Boolean IsIbanFromLoggedInUser(String iban){
-        boolean isIbanFromLoggedInUser;
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
         try{
             if(accountService.getAccountByIban(iban).getUserId() == currentUser.getId()){

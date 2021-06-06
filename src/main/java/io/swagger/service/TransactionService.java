@@ -26,8 +26,11 @@ import java.util.Optional;
 @Service
 public class TransactionService {
 
+    @Autowired
     private TransactionRepository transactionRepository;
+    @Autowired
     private AccountRepository accountRepository;
+    @Autowired
     private AccountService accountService;
     @Autowired
     private UserService userService;
@@ -38,10 +41,7 @@ public class TransactionService {
 
     private static final Logger log = LoggerFactory.getLogger(TransactionService.class);
 
-    public TransactionService(TransactionRepository transactionRepository, AccountRepository accountRepository, AccountService accountService) {
-        this.transactionRepository = transactionRepository;
-        this.accountRepository = accountRepository;
-        this.accountService = accountService;
+    public TransactionService() {
     }
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
