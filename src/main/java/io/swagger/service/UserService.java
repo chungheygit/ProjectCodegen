@@ -1,6 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.model.DTO.LoginDTO;
+import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
@@ -23,7 +24,6 @@ import java.util.List;
 @Service
 public class UserService {
 
-    @Autowired
     UserRepository userRepository;
     @Autowired
     AccountService accountService;
@@ -38,19 +38,38 @@ public class UserService {
 
     private static final Logger log = LoggerFactory.getLogger(UserService.class);
 
-    public UserService() {
+    public UserService(UserRepository userRepository) {
 
-
+        this.userRepository = userRepository;
     }
 
-    public User findUserByEmail(String email)
-    {
-        return userRepository.findUserByEmail(email);
+    // Get all users (With limit en offset)
+    public List<User> getAllUsers(Integer limit, Integer offset) throws Exception {
+        List<User> allUsers = userRepository.findAll();
+
+        if(allUsers.size() == 0){   	return allUsers;       } //No users found
+
+        //apply pagination with/to offset and limit
+        allUsers = createPageable(offset, limit, allUsers);
+
+        return allUsers;
+ }
+
+    // Get a user by its ID
+    public User getUserById (long id){
+        return userRepository
+            .findById(id)
+            .orElseThrow(() ->  new IllegalArgumentException());
     }
 
-    public List<User> getAllUsers(){
-        return userRepository.findAll();
-    }
+//    public User getUserById (long id) {
+//        return userRepository
+//                .findById(id)
+//                .orElseThrow(() ->  new IllegalArgumentException());
+//    }
+
+    // Get all users by mail
+    public User findUserByEmail(String email) { return userRepository.findUserByEmail(email); }
 
     public User createUser (User user){
         if(userRepository.findUserByEmail(user.getEmail()) == null) {
@@ -61,9 +80,6 @@ public class UserService {
             throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Email/password invalid");
         }
     }
-
-
-    public User getUserById (long id){ return userRepository.findById(id).get(); }
 
     public User updateUser(User targetUser) { return userRepository.save(targetUser); }
 
@@ -102,4 +118,46 @@ public class UserService {
         }
         return false;
     }
+
+
+    /**
+     * Apply Pagination
+     * @param offset
+     * @param limit
+     * @param allUsers
+     * @return
+     * @throws Exception
+     */
+    private List<User> createPageable(Integer offset, Integer limit, List<User> allUsers) throws Exception{
+
+        if(limit == null && offset == null){
+            // No pagination
+            return allUsers;
+        }
+
+        int size = allUsers.size();
+        if (offset == null) {
+            offset = 0;
+        }
+        if (limit == null) {
+            limit = size;
+        }
+        if (limit <= 0) {
+            throw new Exception("limit can't be zero or negative");
+        }
+
+        if (offset < 0) {
+            throw new Exception("offset can't be  negative");
+        }
+
+        limit = offset + limit ;
+
+        if(limit > size) { limit  = size;}
+        if(offset > size){ offset = size;}
+
+        allUsers= allUsers.subList(offset, limit);
+
+        return allUsers;
+    }
+
 }

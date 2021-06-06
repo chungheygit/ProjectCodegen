@@ -61,8 +61,7 @@ public class User {
   @JsonProperty("open")
   private Boolean open = null;
 
-  public User(Long id, String firstName, String lastName, LocalDate dateOfBirth, String email, String password, UserType userTypeEnum, BigDecimal dayLimit, BigDecimal transactionLimit, Boolean open) {
-    this.id = id;
+  public User(String firstName, String lastName, LocalDate dateOfBirth, String email, String password, UserType userTypeEnum, BigDecimal dayLimit, BigDecimal transactionLimit, Boolean open) {
     this.firstName = firstName;
     this.lastName = lastName;
     this.dateOfBirth = dateOfBirth;

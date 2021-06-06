@@ -27,7 +27,7 @@ public class Transaction   {
   private Integer id = null;
 
   @JsonProperty("userPerforming")
-  private Integer userPerforming = null;
+  private Long userPerforming = null;
 
   @JsonProperty("timestamp")
   @DateTimeFormat(pattern = "dd-MM-yyyy")
@@ -57,7 +57,7 @@ public class Transaction   {
   @JsonProperty("transactionType")
   private TransactionType transactionType = null;
 
-  public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
+  public Transaction(Long userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
     this.userPerforming = userPerforming;
     this.timestamp = timestamp;
     this.sender = sender;
@@ -91,9 +91,9 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return id
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public Integer getId() {
+  public Integer getId() {
     return id;
   }
 
@@ -101,7 +101,7 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
     this.id = id;
   }
 
-  public Transaction userPerforming(Integer userPerforming) {
+  public Transaction userPerforming(Long userPerforming) {
     this.userPerforming = userPerforming;
     return this;
   }
@@ -111,13 +111,12 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return userPerforming
    **/
   @Schema(required = true, description = "")
-      @NotNull
 
-    public Integer getUserPerforming() {
+  public Long getUserPerforming() {
     return userPerforming;
   }
 
-  public void setUserPerforming(Integer userPerforming) {
+  public void setUserPerforming(Long userPerforming) {
     this.userPerforming = userPerforming;
   }
 
@@ -131,10 +130,10 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return timestamp
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
-    public LocalDateTime getTimestamp() {
+  @Valid
+  public LocalDateTime getTimestamp() {
     return timestamp;
   }
 
@@ -152,9 +151,9 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return sender
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getSender() {
+  public String getSender() {
     return sender;
   }
 
@@ -172,9 +171,9 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return receiver
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getReceiver() {
+  public String getReceiver() {
     return receiver;
   }
 
@@ -193,9 +192,9 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return amount
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    @Valid
+  @Valid
   @DecimalMin("0")  public BigDecimal getAmount() {
     return amount;
   }
@@ -214,9 +213,9 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return description
    **/
   @Schema(required = true, description = "")
-      @NotNull
+  @NotNull
 
-    public String getDescription() {
+  public String getDescription() {
     return description;
   }
 
@@ -235,12 +234,12 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
     }
     Transaction transaction = (Transaction) o;
     return Objects.equals(this.id, transaction.id) &&
-        Objects.equals(this.userPerforming, transaction.userPerforming) &&
-        Objects.equals(this.timestamp, transaction.timestamp) &&
-        Objects.equals(this.sender, transaction.sender) &&
-        Objects.equals(this.receiver, transaction.receiver) &&
-        Objects.equals(this.amount, transaction.amount) &&
-        Objects.equals(this.description, transaction.description);
+            Objects.equals(this.userPerforming, transaction.userPerforming) &&
+            Objects.equals(this.timestamp, transaction.timestamp) &&
+            Objects.equals(this.sender, transaction.sender) &&
+            Objects.equals(this.receiver, transaction.receiver) &&
+            Objects.equals(this.amount, transaction.amount) &&
+            Objects.equals(this.description, transaction.description);
   }
 
   @Override
@@ -252,7 +251,7 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
-    
+
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    userPerforming: ").append(toIndentedString(userPerforming)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");

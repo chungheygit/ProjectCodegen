@@ -1,5 +1,7 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -11,7 +13,10 @@ import org.threeten.bp.LocalDate;
 import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -24,11 +29,10 @@ import javax.validation.constraints.*;
 
 
 public class Account   {
-  @Id
-  @GeneratedValue
   @JsonProperty("userId")
   private Long userId = null;
 
+  @Id
   @JsonProperty("iban")
   private String iban = null;
 
@@ -53,7 +57,8 @@ public class Account   {
     return this;
   }
 
-  public Account(String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
+  public Account(Long userId, String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
+    this.userId = userId;
     this.iban = iban;
     this.balance = balance;
     this.createdDate = createdDate;

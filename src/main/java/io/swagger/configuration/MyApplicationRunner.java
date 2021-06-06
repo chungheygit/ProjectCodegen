@@ -2,6 +2,7 @@ package io.swagger.configuration;
 
 import io.swagger.model.*;
 import io.swagger.repository.TransactionRepository;
+import io.swagger.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import io.swagger.repository.AccountRepository;
@@ -26,59 +27,47 @@ public class MyApplicationRunner implements ApplicationRunner {
 
 
     //Add all repositories here and in constructor (or @Autowired)
-    private UserService userService;
-
-    private AccountService accountService;
-
-    //Add all repositories here and in constructor (or @Autowired)
-
-    private AccountRepository accountRepository;
+    @Autowired
     private TransactionRepository transactionRepository;
-
-    public MyApplicationRunner(UserService userService, AccountService accountService, AccountRepository accountRepository, TransactionRepository transactionRepository) {
-        this.userService = userService;
-        this.accountService = accountService;
-        this.accountRepository = accountRepository;
-        this.transactionRepository = transactionRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
         ////bank moet account hebben
 
         // Create users
-        User user1 = new User(1L, "test", "test", LocalDate.of(2021,12,20), "lio@test.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), true);
-        User user2 = new User(2L, "test", "test", LocalDate.of(2021,12,20), "lio@test2.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), true);
-        User user3 = new User(3L, "test", "test", LocalDate.of(2021,12,20), "cus","password", UserType.ROLE_CUSTOMER, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
-        User user4 = new User(4L, "test", "test", LocalDate.of(2021,12,20), "emp","password", UserType.ROLE_EMPLOYEE, new BigDecimal("100.02"), new BigDecimal("200.02"), false);
+        List<User> users =
+                Arrays.asList(
+                        new User("Bruno", "Fernandes", LocalDate.of(2021,1,25), "lio@test.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("1000.02"), new BigDecimal("250.02"), true),
+                        new User("Frenkie", "De Jong", LocalDate.of(2021,4,20), "lio@test2.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.02"), new BigDecimal("250.02"), true),
+                        new User("Kevin", "De Bruyne", LocalDate.of(2021,6,1), "cus","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.02"), new BigDecimal("250.02"), false),
+                        new User("N'Golo", "Kanté", LocalDate.of(2021,3,18), "emp","password", UserType.ROLE_EMPLOYEE, new BigDecimal("1000.02"), new BigDecimal("250.02"), false)
+                );
+        users.forEach(userRepository::save);
 
-        userService.createUser(user1);
-        userService.createUser(user2);
-        userService.createUser(user3);
-        userService.createUser(user4);
+        // Create accounts
+        List<Account> accounts =
+                Arrays.asList(
+                        new Account(users.get(0).getId(), "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true),
+                        new Account(users.get(1).getId(), "NL58INHO0123456788", new BigDecimal(200 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true),
+                        new Account(users.get(2).getId(), "NL58INHO0123456701", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true),
+                        new Account(users.get(3).getId(), "NL58INHO0123456702", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), false)
+                );
 
-        // Create an Account
-        Account account1 = new Account( "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,01), AccountType.CURRENT, new BigDecimal(10 ), true);
-        Account account2 = new Account( "NL58INHO0123456788", new BigDecimal(200 ), java.time.LocalDate.of(2021,06,03), AccountType.CURRENT, new BigDecimal(10 ), true);
-        Account account3 = new Account( "NL58INHO0123456701", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,05), AccountType.CURRENT, new BigDecimal(10 ), true);
-        //closed account
-        Account account4 = new Account( "NL58INHO0123456702", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,06,04), AccountType.CURRENT, new BigDecimal(10 ), false);
+        accounts.forEach(accountRepository::save);
 
-        accountRepository.save(account1);
-        accountRepository.save(account2);
-        accountRepository.save(account3);
-        accountRepository.save(account4);
-
-        //Create transactions
-        Transaction transaction1 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(100), "water bill");
-        Transaction transaction2 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456701", new BigDecimal(100), "water bill");
-        Transaction transaction3 = new Transaction(1, LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456789", "NL58INHO0123456702", new BigDecimal(100), "water bill");
-        Transaction transaction4 = new Transaction(1, LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456788", "NL58INHO0123456701", new BigDecimal(100), "water bill");
-
-        transactionRepository.save(transaction1);
-        transactionRepository.save(transaction2);
-        transactionRepository.save(transaction3);
-        transactionRepository.save(transaction4);
+        // Create transactions
+        List<Transaction> transactions =
+                Arrays.asList(
+                        new Transaction(users.get(0).getId(), LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(150), "water bill"),
+                        new Transaction(users.get(1).getId(), LocalDateTime.now(), "NL58INHO0123456788", "NL58INHO0123456701", new BigDecimal(230), "taxes"),
+                        new Transaction(users.get(2).getId(), LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456701", "NL58INHO0123456702", new BigDecimal(199), "electricity bill"),
+                        new Transaction(users.get(3).getId(), LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456702", "NL58INHO0123456701", new BigDecimal(500), "loan")
+                );
+        transactions.forEach(transactionRepository::save);
     }
 
 }
