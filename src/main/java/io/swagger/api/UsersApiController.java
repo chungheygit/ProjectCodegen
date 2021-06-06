@@ -89,21 +89,31 @@ public class UsersApiController implements UsersApi {
         }
     }
 
-    public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO) {
-            return new ResponseEntity<String>(userService.login(loginDTO), HttpStatus.OK);
+    public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO body) {
+        try {
+            return new ResponseEntity<String>(userService.login(body), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Couldn't serialize response for content type application/json", e);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId, @Valid @RequestBody User body) {
+)) @PathVariable("userId") Long userId, @Valid @RequestBody User body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
-                User targetUser = userService.getUserById(userId);
-                return new ResponseEntity<User>(userService.updateUser(body), HttpStatus.OK);
+                    User targetUser = userService.getUserById(userId);
+
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<User>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
             }
+            if(!userService.IsLoggedInUserEmployee()){
+                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
+            }
+            body.setId(Long.valueOf(userId.longValue()));
+            return new ResponseEntity<User>(userService.updateUser(body), HttpStatus.OK);
         }
 
         return new ResponseEntity<User>(HttpStatus.NOT_FOUND);

@@ -29,6 +29,7 @@ import javax.validation.constraints.*;
 
 
 public class Account   {
+
   @JsonProperty("userId")
   private Long userId = null;
 

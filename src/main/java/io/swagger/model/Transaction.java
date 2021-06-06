@@ -27,7 +27,7 @@ public class Transaction   {
   private Integer id = null;
 
   @JsonProperty("userPerforming")
-  private Integer userPerforming = null;
+  private Long userPerforming = null;
 
   @JsonProperty("timestamp")
   @DateTimeFormat(pattern = "dd-MM-yyyy")
@@ -57,7 +57,7 @@ public class Transaction   {
   @JsonProperty("transactionType")
   private TransactionType transactionType = null;
 
-  public Transaction(Integer userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
+  public Transaction(Long userPerforming, LocalDateTime timestamp, String sender, String receiver, BigDecimal amount, String description) {
     this.userPerforming = userPerforming;
     this.timestamp = timestamp;
     this.sender = sender;
@@ -101,7 +101,7 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
     this.id = id;
   }
 
-  public Transaction userPerforming(Integer userPerforming) {
+  public Transaction userPerforming(Long userPerforming) {
     this.userPerforming = userPerforming;
     return this;
   }
@@ -111,13 +111,12 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
    * @return userPerforming
    **/
   @Schema(required = true, description = "")
-  @NotNull
 
-  public Integer getUserPerforming() {
+  public Long getUserPerforming() {
     return userPerforming;
   }
 
-  public void setUserPerforming(Integer userPerforming) {
+  public void setUserPerforming(Long userPerforming) {
     this.userPerforming = userPerforming;
   }
 
