@@ -79,8 +79,6 @@ public class TransactionService {
         accountService.addToBalance(receiverAccount, transaction.getAmount());
         accountService.subtractFromBalance(senderAccount, transaction.getAmount());
 
-        System.out.println("Sender: " + senderAccount.getBalance() + " receiver: " + receiverAccount.getBalance() );
-
         log.info("Transaction successfully created");
         return transactionRepository.save(transaction);
     }
