@@ -1,6 +1,7 @@
 package io.swagger.service;
 
 import io.swagger.model.DTO.LoginDTO;
+import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
@@ -55,7 +56,17 @@ public class UserService {
  }
 
     // Get a user by its ID
-    public User getUserById (long id){ return userRepository.findById(id).get(); }
+    public User getUserById (long id){
+        return userRepository
+            .findById(id)
+            .orElseThrow(() ->  new IllegalArgumentException());
+    }
+
+//    public User getUserById (long id) {
+//        return userRepository
+//                .findById(id)
+//                .orElseThrow(() ->  new IllegalArgumentException());
+//    }
 
     // Get all users by mail
     public User findUserByEmail(String email) { return userRepository.findUserByEmail(email); }
@@ -80,7 +91,7 @@ public class UserService {
 
             return "Bearer " + jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
         }catch (AuthenticationException exception){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Wrong email/password");
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "email/password invalid");
         }
 
     }
@@ -96,6 +107,7 @@ public class UserService {
     }
 
     public Boolean IsIbanFromLoggedInUser(String iban){
+        boolean isIbanFromLoggedInUser;
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
         try{
             if(accountService.getAccountByIban(iban).getUserId() == currentUser.getId()){
