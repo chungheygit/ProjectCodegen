@@ -42,11 +42,14 @@ public class UsersApiController implements UsersApi {
     }
 
     // CREATE A NEW USER
-    @PreAuthorize("hasRole('Employee')")
+   // @PreAuthorize("hasRole('EMPLOYEE')")
     public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody User body) {
         String accept = request.getHeader("Accept");
         //Create User
         try {
+            if(!userService.IsLoggedInUserEmployee()) {
+                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
+            }
             return new ResponseEntity<User>(userService.createUser(body),HttpStatus.OK);
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -61,10 +64,14 @@ public class UsersApiController implements UsersApi {
 
         List<User> users = new ArrayList<User>();
         try {
+
             // GET ALL USERS BY MAIL
             if (email != null) {
                 User u = userService.findUserByEmail(email);
                 //users = new ArrayList<User>();
+                if(!userService.IsLoggedInUserEmployee()) {
+                    return new ResponseEntity<List<User>>(HttpStatus.UNAUTHORIZED);
+                }
                 if (u == null)
                     return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
                 users.add(u);
@@ -83,6 +90,9 @@ public class UsersApiController implements UsersApi {
         String accept = request.getHeader("Accept");
         //Get user by id
         try {
+            if(!userService.IsLoggedInUserEmployee()) {
+                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
+            }
             return new ResponseEntity<User>(userService.getUserById(userId),HttpStatus.OK);
         } catch (IllegalArgumentException iae) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
