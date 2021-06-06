@@ -11,7 +11,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="swagger-spring" target="8" />
+      <module name="swagger-spring" target="11" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
