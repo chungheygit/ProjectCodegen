@@ -70,59 +70,6 @@ public class TransactionsApiControllerTest {
         transaction = new Transaction(1L, LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(100), "test");
     }
 
-    @Test
-    public void testMethode(){
-    transactions.contains(new Transaction(users.get(3).getId(), LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456702", "NL58INHO0123456701", new BigDecimal(500), "loan"));
-    }
 
-    @Test
-    public void getAllTransactionsShouldReturnAJsonArray() throws Exception {
-        given(transactionService.getAllTransactions()).willReturn(List.of(transaction));
-        this.mvc.perform(
-                get("/Transactions/getAllTransactionsUsingGET"))
-                .andExpect(
-                        status().isOk())
-                .andExpect(jsonPath("$",hasSize(1))
-                );
-    }
-    @Test
-    public void callingTransaction1ShouldReturnOk() throws Exception {
-        this.mvc.perform(get("/Transactions/getTransactionByIdUsingGET/transactions/1"))
-                .andExpect(status().isOk());
-    }
-
-//    @Test
-//    public void callingAllTransactionsShouldReturnOk() throws Exception {
-//        given(transactionService.g("NL25INHO0123456789")).willReturn(transaction);
-//
-//        this.mvc.perform(get("/users/2/accounts/NL25INHO0123456789/transactions/")).andExpect(
-//                status().isOk()).andExpect(jsonPath("$", hasSize(3)));
-//    }
-
-    @Test
-    public void postingTransactionShouldReturn201Created() throws Exception {
-        this.mvc.perform(
-                MockMvcRequestBuilders
-                        .post("/users/2/accounts/NL25INHO0625145897/transactions/")
-                        .content("{\r\n  \"transactionDateTime\": \"2020-05-27T10:15:30+01:00\",\r\n  \"userPerforming\": {\r\n    \"id\": 2\r\n  },\r\n  \"amount\": 200.00,\r\n  \"accountTo\": {\r\n    \"iban\": \"NL25INHO0625145896\"\r\n  },\r\n  \"accountFrom\": {\r\n    \"iban\": \"NL25INHO0625145897\"\r\n  }\r\n}")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated());
-    }
-
-    @Test
-    @DisplayName("check if transaction can be a negative amount")
-    public void testTransactionNegativeAmount() throws Exception {
-        this.mvc.perform(post("/transactions")
-                .content("{\n" +
-                        "  \"AccountFrom\": \"NL58INHO0123456789\",\n" +
-                        "  \"AccountTo\": \"NL58INHO0123456788\",\n" +
-                        "  \"Amount\": -100.00\n" +
-                        "}")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8"))
-                .andExpect(status().isBadRequest());
-    }
 
 }

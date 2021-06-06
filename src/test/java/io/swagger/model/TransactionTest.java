@@ -33,15 +33,6 @@ class TransactionTest {
         assertEquals(1, transaction.getId());
     }
 
-//    @Test
-//    public void getUserPerformingShouldReturnPerformingUser() {
-//        assertEquals(user, transaction.getUserPerforming());
-//    }
-//
-//    @Test
-//    public void getAccountFromShouldReturnAccount() {
-//        assertEquals(accountFrom, transaction.getAccountFrom());
-//    }
 
     @Test
     public void getAmountShouldReturnAmount() {
@@ -66,35 +57,6 @@ class TransactionTest {
         IllegalArgumentException e = assertThrows(IllegalArgumentException.class, transaction::validate);
         assertThat(e).hasMessage("Cannot transfer to same account");
     }
-//    @Test
-//    public void validateTransactionToOtherUserSavingsShouldThrowIllegalArgumentException() {
-//        accountFrom.setAccountType(AccountType.SAVINGS);
-//        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, transaction::validate);
-//        assertThat(e).hasMessage("Can only transfer to or from savings account of the same user");
-//    }
-//
-//    @Test
-//    public void validateTransactionToSameUserSavingsShouldNotThrowIllegalArgumentException() {
-//        accountFrom.userId(2L);
-//        accountTo.userId(2L);
-//        accountTo.setAccountType(AccountType.SAVINGS);
-//
-//        assertDoesNotThrow(transaction::validate);
-//    }
-//
-//    @Test
-//    public void transactionExceedingDayLimitShouldReturnIllegalArgumentException() {
-//        accountFrom.setDayLimit(BigDecimal.valueOf(100.00));
-//        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, transaction::validate);
-//        assertThat(e).hasMessage("Transaction would exceed daily limit.");
-//    }
-//
-//    @Test
-//    public void transactionExceedingTransactionLimitShouldReturnIllegalArgumentException() {
-//        accountFrom.setTransactionLimit(BigDecimal.valueOf(100.00));
-//        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, transaction::validate);
-//        assertThat(e).hasMessage("Transaction amount exceeds transaction limit for account.");
-//    }
 
     @Test
     public void transactionExceedingAbsoluteLimitShouldReturnIllegalArgumentException() {

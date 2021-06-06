@@ -186,55 +186,6 @@ public class TransactionService {
         else{
             return getAllTransactions();
         }
-        //return transactionRepository.getTransactionsByIban(iban, offset, limit, startDate, endDate);
+
     }
-
-    public void validateTransaction(Transaction transaction) throws Exception {
-        checkIfTransactionIsNotToSameAccount(transaction);
-
-        if (isFromOrToSavingsAccount(transaction)){
-          checkIfTransactionIsToSameUser(transaction);
-        }
-//        this.getAccountFrom().checkIfTransactionWouldLowerBalanceBelowAbsoluteLimit(this);
-//        this.getAccountFrom().checkIfTransactionWouldExceedDailyLimit(this);
-//        this.getAccountFrom().checkIfTransactionExceedsTransactionLimit(this);
-    }
-
-    private void checkIfTransactionIsNotToSameAccount(Transaction transaction) {
-        if (transaction.getSender() == transaction.getReceiver()){
-            throw new IllegalArgumentException("Cannot transfer to same account");
-        }
-    }
-
-    private boolean isFromOrToSavingsAccount(Transaction transaction) {
-        return accountRepository.getAccountByIban(transaction.getReceiver()).getAccountType() == AccountType.SAVINGS || accountRepository.getAccountByIban(transaction.getSender()).getAccountType() == AccountType.SAVINGS;
-    }
-
-    private void checkIfTransactionIsToSameUser(Transaction transaction){
-        if (transaction.getSender() != transaction.getReceiver()){
-        throw new IllegalArgumentException("Can only transfer to or from savings account of the same user");
-        }
-    }
-
-//    public void checkIfTransactionExceedsTransactionLimit(Transaction transaction) {
-//        //Amount > transactionLimit
-//        if (transaction.getAmount().compareTo(accountRepository.getAccountByIban(transaction.getSender()).g) > 0)
-//            throw new IllegalArgumentException("Transaction amount exceeds transaction limit for account.");
-//    }
-//
-//    public void checkIfTransactionWouldExceedDailyLimit(Transaction transaction) {
-//
-//        final BigDecimal[] debitAmountForToday = {BigDecimal.ZERO};
-//        getDebitsForToday().stream().map(Transaction::getAmount).forEach(bigDecimal -> debitAmountForToday[0] = debitAmountForToday[0].add(bigDecimal));
-//
-//        //debitAmountForToday + transactionAmount > dayLimit
-//        if (debitAmountForToday[0].add(transaction.getAmount()).compareTo(this.dayLimit) > 0)
-//            throw new IllegalArgumentException("Transaction would exceed daily limit.");
-//    }
-//
-//    public void checkIfTransactionWouldLowerBalanceBelowAbsoluteLimit(Transaction transaction) throws Exception {
-//        //Balance - transactionAmount < absoluteLimit
-//        if (this.balance.subtract(transaction.getAmount()).compareTo(this.absoluteLimit) < 0)
-//            throw new IllegalArgumentException("Transaction would lower balance below absolute account limit.");
-//    }
 }

@@ -273,4 +273,16 @@ public Transaction(/*Integer userPerforming, */ String sender, String receiver, 
     }
     return o.toString().replace("\n", "\n    ");
   }
+  public void validate() throws Exception {
+    checkIfTransactionIsNotToSameAccount();
+//    if (this.isFromOrToSavingsAccount()){
+//      checkIfTransactionIsToSameUser();
+//    }
+  }
+
+  private void checkIfTransactionIsNotToSameAccount() {
+    if (this.getSender() == this.getReceiver()){
+      throw new IllegalArgumentException("Cannot transfer to same account");
+    }
+  }
 }
