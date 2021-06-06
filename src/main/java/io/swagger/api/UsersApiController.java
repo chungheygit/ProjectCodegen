@@ -99,7 +99,7 @@ public class UsersApiController implements UsersApi {
     }
 
     public ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId, @Valid @RequestBody User body) {
+)) @PathVariable("userId") Long userId, @Valid @RequestBody User body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
             try {
