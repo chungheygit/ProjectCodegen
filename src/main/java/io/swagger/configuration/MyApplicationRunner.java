@@ -34,6 +34,9 @@ public class MyApplicationRunner implements ApplicationRunner {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         ////bank moet account hebben
@@ -46,7 +49,7 @@ public class MyApplicationRunner implements ApplicationRunner {
                         new User("Kevin", "De Bruyne", LocalDate.of(2021,6,1), "cus","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.02"), new BigDecimal("250.02"), false),
                         new User("N'Golo", "Kanté", LocalDate.of(2021,3,18), "emp","password", UserType.ROLE_EMPLOYEE, new BigDecimal("1000.02"), new BigDecimal("250.02"), false)
                 );
-        users.forEach(userRepository::save);
+        users.forEach(userService ::createUser);
 
         // Create accounts
         List<Account> accounts =
