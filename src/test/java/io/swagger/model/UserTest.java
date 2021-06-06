@@ -5,12 +5,14 @@ import io.swagger.service.UserService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@SpringBootTest
 public class UserTest {
         private User user;
 
@@ -29,7 +31,7 @@ public class UserTest {
         public void createUserShouldNotBeNull(){
             Assertions.assertNotNull(user);
         }
-        
+
 
         @Test
         public void setAbsoluteLimitShouldUpdateAbsoluteLimit() {
