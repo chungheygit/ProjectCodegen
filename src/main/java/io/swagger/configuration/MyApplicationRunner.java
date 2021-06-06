@@ -60,7 +60,7 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         // Create an Account
         Account account1 = new Account(1L, "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
-        Account account2 = new Account(2L, "NL58INHO0123456788", new BigDecimal(200 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account account2 = new Account(2L, "NL58INHO0123456788", new BigDecimal(1000 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
         Account account3 = new Account(3L, "NL58INHO0123456701", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), true);
         //closed account
         Account account4 = new Account(4L, "NL58INHO0123456702", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,05,27), AccountType.CURRENT, new BigDecimal(500 ), false);
@@ -68,10 +68,12 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Add account
         accountService.createAccount(account1);
         accountService.createAccount(account2);
+        accountService.createAccount(account3);
+        accountService.createAccount(account4);
 
         Transaction transaction1 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(200), "water bill");
         Transaction transaction2 = new Transaction(1, LocalDateTime.now(), "NL58INHO0123456789", "NL58INHO0123456701", new BigDecimal(200), "water bill");
-        Transaction transaction3 = new Transaction(1, LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456789", "NL58INHO0123456702", new BigDecimal(200), "water bill");
+        Transaction transaction3 = new Transaction(1, LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456788", "NL58INHO0123456709", new BigDecimal(200), "water bill");
         Transaction transaction4 = new Transaction(1, LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456788", "NL58INHO0123456701", new BigDecimal(200), "water bill");
 
         transactionRepository.save(transaction1);

@@ -88,7 +88,7 @@ public class AccountService {
     }
 
     //makes sure a customer can only retrieve his own accounts
-    public Account getAccountByIbanWithSecurity(String iban) throws Exception {
+    public Account getAccountByIbanSecured(String iban) throws Exception {
         if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
             log.error("User tried getting account from other user");
             throw new Exception("This account does not belong to you");
