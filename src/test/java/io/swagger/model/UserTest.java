@@ -29,11 +29,7 @@ public class UserTest {
         public void createUserShouldNotBeNull(){
             Assertions.assertNotNull(user);
         }
-
-        @Test
-        public void creatingAUserShouldReturnNumberOfStringsSix(){
-        Assertions.assertEquals(6, user.getNumberOfStrings());
-        }
+        
 
         @Test
         public void setAbsoluteLimitShouldUpdateAbsoluteLimit() {
