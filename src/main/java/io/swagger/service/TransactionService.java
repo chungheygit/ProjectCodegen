@@ -156,10 +156,11 @@ public class TransactionService {
     public List<Transaction> getTransactionsByFilters(String iban, Integer offset, Integer limit, String startDate, String endDate){
 
         //default values
-        LocalDate parsedStartDate=LocalDate.of(1900,01,01);;
+        //parsedStartDate is equal to the opening of our bank
+        LocalDate parsedStartDate=LocalDate.of(1998,11,23);;
         LocalDate parsedEndDate=LocalDate.now();
 
-        //if filters are not used. get
+        //if a filter is used. check further..
         if(iban!=null || offset!=null || limit!=null || startDate!=null || endDate!=null) {
             if (startDate != null || endDate != null) {
                 if (startDate != null) {

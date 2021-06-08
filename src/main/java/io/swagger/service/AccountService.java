@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
+import javax.persistence.GeneratedValue;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,9 +46,7 @@ public class AccountService {
     public List<Account> getAccountByCreatedDate(java.time.LocalDate date, Integer offset, Integer limit){
         if(date == null && offset == null && limit == null)
         {
-            date = java.time.LocalDate.now();
-            offset= 0;
-            limit = 10;
+            return GetAllAccounts();
         }
 
         return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
