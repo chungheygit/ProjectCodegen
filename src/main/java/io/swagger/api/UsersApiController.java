@@ -3,6 +3,7 @@ package io.swagger.api;
 import io.swagger.model.DTO.LoginDTO;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -34,11 +35,14 @@ public class UsersApiController implements UsersApi {
 
     private final UserService userService;
 
+    private final AccountService accountService;
+
     @org.springframework.beans.factory.annotation.Autowired
-    public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request, UserService userService) {
+    public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request, UserService userService, AccountService accountService) {
         this.objectMapper = objectMapper;
         this.request = request;
         this.userService = userService;
+        this.accountService = accountService;
     }
 
     // CREATE A NEW USER
@@ -107,15 +111,19 @@ public class UsersApiController implements UsersApi {
 )) @PathVariable("userId") Long userId, @Valid @RequestBody User body) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
+            if(!userService.IsLoggedInUserEmployee()){
+                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
+            }
+            //userid of our bank is 0
+            if(userId==0){
+                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
+            }
             try {
                     User targetUser = userService.getUserById(userId);
 
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);
                 return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
-            }
-            if(!userService.IsLoggedInUserEmployee()){
-                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
             }
             body.setId(Long.valueOf(userId.longValue()));
             return new ResponseEntity<User>(userService.updateUser(body), HttpStatus.OK);

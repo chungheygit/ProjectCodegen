@@ -53,7 +53,7 @@ public class UserService {
         allUsers = createPageable(offset, limit, allUsers);
 
         return allUsers;
- }
+    }
 
     // Get a user by its ID
     public User getUserById (long id){

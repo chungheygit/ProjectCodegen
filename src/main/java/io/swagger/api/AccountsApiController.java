@@ -104,6 +104,10 @@ public class AccountsApiController implements AccountsApi {
                 if(!userService.IsLoggedInUserEmployee()) {
                     return new ResponseEntity<Account>(HttpStatus.UNAUTHORIZED);
                 }
+                // The account of our bank can not be updated
+                if(iban=="NL01INHO0000000001") {
+                    return new ResponseEntity<Account>(HttpStatus.UNAUTHORIZED);
+                }
                 return new ResponseEntity<Account>(accountService.updateAccount(body), HttpStatus.OK);
             } catch (Exception e) {
                 log.error("Couldn't serialize response for content type application/json", e);

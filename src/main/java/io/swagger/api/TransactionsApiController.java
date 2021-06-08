@@ -57,10 +57,10 @@ public class TransactionsApiController implements TransactionsApi {
     )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) String startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) String endDateTime) {
         String accept = request.getHeader("Accept");
         if (accept != null && accept.contains("application/json")) {
+            if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+                return new ResponseEntity<List<Transaction>>(HttpStatus.UNAUTHORIZED);
+            }
             try {
-                if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
-                    return new ResponseEntity<List<Transaction>>(HttpStatus.UNAUTHORIZED);
-                }
                 return new ResponseEntity<List<Transaction>>(transactionService.getTransactionsByFilters(iban, offset, limit, startDateTime, endDateTime), HttpStatus.OK);
 
             } catch (IllegalArgumentException e) {
@@ -68,7 +68,6 @@ public class TransactionsApiController implements TransactionsApi {
                 return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_FOUND);
             }
         }
-
         return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_IMPLEMENTED);
     }
     public ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "The transaction ID", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId) {
