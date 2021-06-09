@@ -53,7 +53,7 @@ public class Account   {
   }
 
   public Account(Account account, String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
-    this.user = userId; //findUserByUserId
+    this.user = setUser(userId); //findUserByUserId
     this.iban = iban;
     this.balance = balance;
     this.createdDate = createdDate;
@@ -77,8 +77,8 @@ public class Account   {
     return user;
   }
 
-  public void setUser(User user) {
-    //findUserByID
+  public void setUser(Long userId) {
+    //findUserByID(userId)
     this.user = user;
   }
 
