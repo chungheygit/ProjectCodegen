@@ -17,6 +17,7 @@ import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -60,6 +61,25 @@ public class User {
 
   @JsonProperty("open")
   private Boolean open = null;
+
+  public Boolean getOpen() {
+    return open;
+  }
+
+  public List<Account> getAccounts() {
+    return accounts;
+  }
+
+  public void setAccounts(List<Account> accounts) {
+    //check
+    this.accounts = accounts;
+  }
+
+  public void addToAccounts(List<Account> accounts) {
+    this.accounts = accounts;
+  }
+
+  private List<Account> accounts = null;
 
   public User(String firstName, String lastName, LocalDate dateOfBirth, String email, String password, UserType userTypeEnum, BigDecimal dayLimit, BigDecimal transactionLimit, Boolean open) {
     this.firstName = firstName;

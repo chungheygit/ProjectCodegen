@@ -10,14 +10,10 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.threeten.bp.OffsetDateTime;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -60,7 +56,7 @@ public class TransactionService {
         checkIfAmountIsLegit(transaction.getAmount().doubleValue());
 
         Account senderAccount = accountService.getAccountByIban(transaction.getSender());
-        User senderUser = userRepository.getOne(senderAccount.getUserId());
+        User senderUser = userRepository.getOne(senderAccount.getUser());
         Account receiverAccount = accountService.getAccountByIban(transaction.getReceiver());
         User userPerforming = userService.findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
 
@@ -93,7 +89,7 @@ public class TransactionService {
     private TransactionType checkTransactionType(Account sender, Account receiver){
         if(sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS)
         {
-            if(!sender.getUserId().equals(receiver.getUserId())){
+            if(!sender.getUser().equals(receiver.getUser())){
                 log.error("User tried transfering to/from savings account from other user");
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden to transfer from/to savings account from another user.");
             }

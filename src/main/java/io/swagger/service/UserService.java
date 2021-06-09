@@ -1,7 +1,6 @@
 package io.swagger.service;
 
 import io.swagger.model.DTO.LoginDTO;
-import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
@@ -103,7 +102,7 @@ public class UserService {
     public Boolean IsIbanFromLoggedInUser(String iban){
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
         try{
-            if(accountService.getAccountByIban(iban).getUserId() == currentUser.getId()){
+            if(accountService.getAccountByIban(iban).getUser() == currentUser.getId()){
                 return true;
             }
         }catch (Exception e){
