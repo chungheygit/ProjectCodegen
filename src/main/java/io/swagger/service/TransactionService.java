@@ -57,6 +57,8 @@ public class TransactionService {
         ModelMapper modelMapper = new ModelMapper();
         Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
 
+        checkIfAmountIsLegit(transaction.getAmount().doubleValue());
+
         Account senderAccount = accountService.getAccountByIban(transaction.getSender());
         User senderUser = userRepository.getOne(senderAccount.getUserId());
         Account receiverAccount = accountService.getAccountByIban(transaction.getReceiver());
@@ -77,10 +79,15 @@ public class TransactionService {
         accountService.addToBalance(receiverAccount, transaction.getAmount());
         accountService.subtractFromBalance(senderAccount, transaction.getAmount());
 
-        System.out.println("Sender: " + senderAccount.getBalance() + " receiver: " + receiverAccount.getBalance() );
-
         log.info("Transaction successfully created");
         return transactionRepository.save(transaction);
+    }
+
+    private void checkIfAmountIsLegit(double amount){
+        if(amount < 0.01){
+            log.error("User entered illegal amount value");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid amount");
+        }
     }
 
     private TransactionType checkTransactionType(Account sender, Account receiver){
