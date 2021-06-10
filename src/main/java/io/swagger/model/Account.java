@@ -37,7 +37,7 @@ public class Account   {
   @JsonProperty("iban")
   private String iban = null;
 
-  @JsonProperty("balance")
+  @JsonProperty("balance") // ALL ACCOUNTS ARE EUR ACCOUNTS
   private BigDecimal balance = new BigDecimal(0);
 
   @JsonProperty("createdDate")

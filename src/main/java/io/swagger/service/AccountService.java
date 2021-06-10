@@ -94,9 +94,6 @@ public class AccountService {
         // filling properties
         account.setIban(generateIban());
         account.setCreatedDate(java.time.LocalDate.now());
-        account.setAbsoluteLimit(new BigDecimal(500));
-        account.setAccountType(AccountType.CURRENT);
-        account.setOpen(true);
 
 
          return accountRepository.save(account);

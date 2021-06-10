@@ -52,6 +52,7 @@ public class MyApplicationRunner implements ApplicationRunner {
                 );
         users.forEach(userService ::createUser);
 
+        // ALL ACCOUNTS ARE EUR ACCOUNTS
         // Create accounts
         List<Account> accounts =
                 Arrays.asList(
