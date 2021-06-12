@@ -1,7 +1,0 @@
--------------------------------------------------------------------------------
-Test set: io.swagger.model.TransactionTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.11 s <<< FAILURE! - in io.swagger.model.TransactionTest
-io.swagger.model.TransactionTest  Time elapsed: 0.11 s  <<< ERROR!
-java.lang.IllegalStateException: Found multiple @SpringBootConfiguration annotated classes [Generic bean: class [io.swagger.Application]; scope=; abstract=false; lazyInit=null; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in file [C:\Users\admin\Downloads\dev3.1\ProjectCodegen-Dev2.0\target\classes\io\swagger\Application.class], Generic bean: class [io.swagger.Swagger2SpringBoot]; scope=; abstract=false; lazyInit=null; autowireMode=0; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=null; factoryMethodName=null; initMethodName=null; destroyMethodName=null; defined in file [C:\Users\admin\Downloads\dev3.1\ProjectCodegen-Dev2.0\target\classes\io\swagger\Swagger2SpringBoot.class]]
-
