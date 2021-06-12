@@ -9,7 +9,9 @@ import io.swagger.repository.UserRepository;
 import io.swagger.security.MyUserDetailsService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.LocalDate;
 
 import javax.persistence.GeneratedValue;
@@ -40,25 +42,27 @@ public class AccountService {
         usedIBANs = new ArrayList<>();
 
     }
-    public List<Account> GetAllAccounts(){
+    public List<Account> getAllAccounts(){
         return accountRepository.findAll();
     }
-    public List<Account> getAccountByCreatedDate(java.time.LocalDate date, Integer offset, Integer limit){
+    public List<Account> getAccountsByCreatedDate(java.time.LocalDate date, Integer offset, Integer limit){
         if(date == null && offset == null && limit == null)
         {
-            return GetAllAccounts();
+            return getAllAccounts();
         }
 
         return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
     }
     public Account updateAccount(Account account) throws Exception
     {
-
+        User user = new User();
         String Iban = account.getIban();
+
         if (Iban == null)
         {
             throw new Exception("Account does not exist");
         }
+        account.setIban(account.getIban());
 
         return  accountRepository.save(account);
 
@@ -112,6 +116,19 @@ public class AccountService {
         tenDigit3 = String.format("%02d", random.nextInt(100));
         return prefix1 + twoDigit  + prefix2  + tenDigit1  + tenDigit2  + tenDigit3;
     }
+    public User checkIfUserIdIsUsed(User userId) throws Exception {
+        Integer LastUserId = userService.getAllUsers(100,0).size();
+        if (userId.id() == LastUserId || userId.id() < LastUserId){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Id already in use, choose id " + LastUserId);
+        }
+        return userId;
+    }
+//    public void checkIfIbanIsFilledLikeIban(String Iban)
+//    {
+//        Account account = new Account();
+//        String filledIban = account.getIban();
+//        if (filledIban != account.getIban().)
+//    }
 
 
     protected void addToBalance(Account account, BigDecimal amount){
