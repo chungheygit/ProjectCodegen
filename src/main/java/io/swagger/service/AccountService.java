@@ -114,15 +114,24 @@ public class AccountService {
         tenDigit1 = String.format("%03d", random.nextInt(1000));
         tenDigit2 = String.format("%04d", random.nextInt(10000));
         tenDigit3 = String.format("%02d", random.nextInt(100));
-        return prefix1 + twoDigit  + prefix2  + tenDigit1  + tenDigit2  + tenDigit3;
-    }
-    public User checkIfUserIdIsUsed(User userId) throws Exception {
-        Integer LastUserId = userService.getAllUsers(100,0).size();
-        if (userId.id() == LastUserId || userId.id() < LastUserId){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Id already in use, choose id " + LastUserId);
+        String IBAN = prefix1 + twoDigit  + prefix2  + tenDigit1  + tenDigit2  + tenDigit3;
+        while (accountExist(IBAN) == true)
+        {
+            generateIban();
         }
-        return userId;
+        return IBAN;
     }
+    // check if accounts exists
+    public boolean accountExist(String iban) {
+        return (accountRepository.getAccountByIban(iban) != null);
+    }
+//    public User checkIfUserIdIsUsed(User userId) throws Exception {
+//        Integer LastUserId = userService.getAllUsers(100,0).size()-1;
+//        if (userId.id() == LastUserId || userId.id() < LastUserId){
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Id already in use, choose id " + LastUserId);
+//        }
+//        return userId;
+//    }
 //    public void checkIfIbanIsFilledLikeIban(String Iban)
 //    {
 //        Account account = new Account();

@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.model.Account;
+import io.swagger.model.AccountType;
 import io.swagger.model.DTO.AccountDTO;
 import io.swagger.service.AccountService;
 import io.swagger.service.UserService;
@@ -52,20 +53,29 @@ public class AccountsApiController implements AccountsApi {
 
 
     public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody AccountDTO accountDTO) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
             try {
                 if(!userService.IsLoggedInUserEmployee()) {
+                    log.error("Your Not Allowed To Create Accounts For Other Users.");
                     return new ResponseEntity<Account>(HttpStatus.UNAUTHORIZED);
                 }
+                // check if given type is written good, if not return unprocessable entity
+                if (AccountType.fromValue(accountDTO.getAccountType().toString()) == null) {
+                    log.error("Type Was Not Given Correctly, Must Be 'Current' Or 'Savings'");
+                    return new ResponseEntity<Account>(HttpStatus.UNPROCESSABLE_ENTITY);
+                }
+                if (userService.getUserById(accountDTO.getUserId()) != null) { // if given owner of new account is not null, create account
+                    Account createAccount = accountService.createAccount(accountDTO);
+                    log.info("Account created for user : " + accountDTO.getUserId());
+                    return ResponseEntity
+                            .status(HttpStatus.CREATED)
+                            .body(createAccount);
+                }
+
                 return new ResponseEntity<Account>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
             } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Account>(HttpStatus.INTERNAL_SERVER_ERROR);
+                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-        }
 
-        return new ResponseEntity<Account>(HttpStatus.NOT_IMPLEMENTED);
     }
 
     public ResponseEntity<Account> getAccountByIban(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban) throws Exception {
@@ -76,36 +86,33 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<List<Account>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate createdDate) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            if(!userService.IsLoggedInUserEmployee()) {
-                return new ResponseEntity<List<Account>>(HttpStatus.UNAUTHORIZED);
-            }
-            try {
-                return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountsByCreatedDate(createdDate, offset, limit), HttpStatus.OK);
-            } catch (Exception e) {
-                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+        if (!userService.IsLoggedInUserEmployee()) {
+            return new ResponseEntity<List<Account>>(HttpStatus.UNAUTHORIZED);
+        }
+        try {
+            return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountsByCreatedDate(createdDate, offset, limit), HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
 
-        return new ResponseEntity<List<Account>>(HttpStatus.NOT_FOUND);
+
     }
 
-    public ResponseEntity<Account> updateAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Account account) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
+    public ResponseEntity<Account> updateAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Account account) throws Exception {
             // The account of our bank can not be updated
             if(!userService.IsLoggedInUserEmployee() || iban== Bank_IBAN) {
                 return new ResponseEntity<Account>(HttpStatus.UNAUTHORIZED);
+            }
+            Account accountByIban = accountService.getAccountByIban(account.getIban());
+            if(accountByIban != null){
+
             }
             try {
                 return new ResponseEntity<Account>(accountService.updateAccount(account), HttpStatus.OK);
             } catch (Exception e) { ;
                 return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
-        }
 
-        return new ResponseEntity<Account>(HttpStatus.NOT_FOUND);
     }
 
 }
