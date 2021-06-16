@@ -186,6 +186,18 @@ public class AccountService {
             generateIban();
         }
         return IBAN;
+<<<<<<< transactionValidation
+=======
+    }
+    // check if accounts exists
+    public boolean accountExist(String iban) {
+        return (accountRepository.getAccountByIban(iban) != null);
+    }
+
+    // check if user exists
+    public boolean userExist(Long userID) {
+        return (userRepository.getOne(userID)!= null);
+>>>>>>> Dev3.0
     }
     // check if accounts exists
     public boolean accountExist(String iban) {
@@ -196,6 +208,23 @@ public class AccountService {
     public boolean userExist(Long userID) {
         return (userRepository.getOne(userID)!= null);
     }
+
+
+
+
+//    public User checkIfUserIdIsUsed(User userId) throws Exception {
+//        Integer LastUserId = userService.getAllUsers(100,0).size()-1;
+//        if (userId.id() == LastUserId || userId.id() < LastUserId){
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Id already in use, choose id " + LastUserId);
+//        }
+//        return userId;
+//    }
+//    public void checkIfIbanIsFilledLikeIban(String Iban)
+//    {
+//        Account account = new Account();
+//        String filledIban = account.getIban();
+//        if (filledIban != account.getIban().)
+//    }
 
 
 
