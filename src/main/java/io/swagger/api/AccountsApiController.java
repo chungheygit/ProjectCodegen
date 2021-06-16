@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -68,12 +67,7 @@ public class AccountsApiController implements AccountsApi {
     }
 
     public ResponseEntity<Account> getAccountByIban(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban) throws Exception {
-        if(!accountService.getAccountByIbanUserAuthorized(iban)){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
-        }
-        else{
-            return new ResponseEntity<Account>(accountService.getAccountByIban(iban), HttpStatus.OK);
-        }
+        return new ResponseEntity<Account>(accountService.getAccountByIbanWithSecurity(iban), HttpStatus.OK);
     }
 
 

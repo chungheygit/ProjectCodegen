@@ -1,10 +1,16 @@
 package io.swagger.model;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.OffsetDateTime;
 import org.springframework.validation.annotation.Validated;
 
 import javax.persistence.Entity;
@@ -24,8 +30,8 @@ import javax.validation.constraints.*;
 
 public class Account   {
 
-  @JsonProperty("user")
-  private User user = null;
+  @JsonProperty("userId")
+  private Long userId = null;
 
   @Id
   @JsonProperty("iban")
@@ -48,12 +54,12 @@ public class Account   {
   private Boolean open = null;
 
   public Account userId(Long userId) {
-    this.user = userId;
+    this.userId = userId;
     return this;
   }
 
-  public Account(Account account, String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
-    this.user = setUser(userId); //findUserByUserId
+  public Account(Long userId, String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
+    this.userId = userId;
     this.iban = iban;
     this.balance = balance;
     this.createdDate = createdDate;
@@ -73,13 +79,12 @@ public class Account   {
   @Schema(required = true, description = "")
       @NotNull
 
-  @Min(1L)  public User getUser() {
-    return user;
+  @Min(1L)  public Long getUserId() {
+    return userId;
   }
 
-  public void setUser(Long userId) {
-    //findUserByID(userId)
-    this.user = user;
+  public void setUserId(Long userId) {
+    this.userId = userId;
   }
 
   public Account iban(String iban) {
@@ -215,7 +220,7 @@ public class Account   {
       return false;
     }
     Account account = (Account) o;
-    return Objects.equals(this.user, account.user) &&
+    return Objects.equals(this.userId, account.userId) &&
         Objects.equals(this.iban, account.iban) &&
         Objects.equals(this.balance, account.balance) &&
         Objects.equals(this.createdDate, account.createdDate) &&
@@ -226,7 +231,7 @@ public class Account   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(user, iban, balance, createdDate, accountType, absoluteLimit, open);
+    return Objects.hash(userId, iban, balance, createdDate, accountType, absoluteLimit, open);
   }
 
   @Override
@@ -234,7 +239,7 @@ public class Account   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Account {\n");
     
-    sb.append("    userId: ").append(toIndentedString(user)).append("\n");
+    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
     sb.append("    iban: ").append(toIndentedString(iban)).append("\n");
     sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
