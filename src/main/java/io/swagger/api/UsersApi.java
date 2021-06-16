@@ -6,6 +6,7 @@
 package io.swagger.api;
 
 import io.swagger.model.DTO.LoginDTO;
+import io.swagger.model.DTO.UserDTO;
 import io.swagger.model.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -121,7 +122,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
     ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Long userId, @Valid @RequestBody User body);
+)) @PathVariable("userId") Long userId, @Valid @RequestBody UserDTO targetUser);
 
 }
 

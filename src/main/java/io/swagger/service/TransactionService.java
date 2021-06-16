@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -47,9 +48,10 @@ public class TransactionService {
         return transactionRepository.findAll();
     }
 
-    public Transaction getTransactionById (Integer transactionId) throws IllegalArgumentException{
-        Optional<Transaction> optional = transactionRepository.findById(transactionId);
-        return optional.orElseThrow(IllegalArgumentException::new);
+    public Transaction getTransactionById (Integer transactionId) {
+        return transactionRepository
+                .findById(transactionId)
+                    .orElseThrow(() ->  new EntityNotFoundException("Transaction not found"));
     }
 
     public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception{
@@ -58,7 +60,7 @@ public class TransactionService {
         Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
 
         Account senderAccount = accountService.getAccountByIban(transaction.getSender());
-        User senderUser = userRepository.getOne(senderAccount.getUserId());
+        User senderUser = userRepository.getOne(senderAccount.getUser().getId());
         Account receiverAccount = accountService.getAccountByIban(transaction.getReceiver());
         User userPerforming = userService.findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
 
@@ -86,7 +88,7 @@ public class TransactionService {
     private TransactionType checkTransactionType(Account sender, Account receiver){
         if(sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS)
         {
-            if(!sender.getUserId().equals(receiver.getUserId())){
+            if(!sender.getUser().getId().equals(receiver.getUser().getId())){
                 log.error("User tried transfering to/from savings account from other user");
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden to transfer from/to savings account from another user.");
             }
@@ -152,9 +154,51 @@ public class TransactionService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
         }
     }
+    public Boolean validateTransactionId(String transactionId){
+        //mag niet negatief en moet integer zijn
+
+        try {
+            Integer intValue = Integer.parseInt(transactionId);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    public Boolean isTransactionFromLoggedInUser(Integer transactionid){
+        //getting the transaction
+        Transaction transaction = getTransactionById(transactionid);
+
+        //getting the loggedIn user
+        User loggedInUser = userService.findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
+
+        //getting the accounts of loggedIn user
+        List<Account>accountsOfLoggedInUser =accountService.getAccountsByUserId(loggedInUser.getId());
+
+        // checks if sender is equal to loggedinuser
+
+        for (Account a : accountsOfLoggedInUser){
+
+            for(int i = 0; i < accountsOfLoggedInUser.size(); i++) {
+
+                //checks first if account is of loggedIn user
+                if(a.getUser().getId().equals(loggedInUser.getId()))
+                {
+                    //checks if iban of account is equal to iban of receiver or sender
+                    if(a.getIban().equals(transaction.getReceiver()) || a.getIban().equals(transaction.getSender())){
+                        return true;
+                    }
+
+                }
+            }
+        }
+        return false;
+    }
 
     public List<Transaction> getTransactionsByFilters(String iban, Integer offset, Integer limit, String startDate, String endDate){
 
+
+        // starttijd mag niet eerder dan eindtijd.
+        //
         //default values
         //parsedStartDate is equal to the opening of our bank
         LocalDate parsedStartDate=LocalDate.of(1998,11,23);;
@@ -162,6 +206,7 @@ public class TransactionService {
 
         //if a filter is used. check further..
         if(iban!=null || offset!=null || limit!=null || startDate!=null || endDate!=null) {
+            // startDate or endDate filter used
             if (startDate != null || endDate != null) {
                 if (startDate != null) {
                     parsedStartDate = LocalDate.parse(startDate);
@@ -172,8 +217,9 @@ public class TransactionService {
                 if(iban==null) {
                     return transactionRepository.getTransactionsByDay(parsedStartDate,parsedEndDate,limit,offset);
                 }
+                // iban filter used
             } else if (iban != null) {
-                //account ophalen
+                //get account
                 Account account = accountRepository.getAccountByIban(iban);
 
                 if (startDate == null) {
