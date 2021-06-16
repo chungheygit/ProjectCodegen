@@ -49,9 +49,6 @@ public class AccountService {
         updateAccountDTO = new UpdateAccountDTO();
 
     }
-    public List<Account> getAccountsByUserId (Long userId) {
-        return accountRepository.getAccountByUserId(userId);
-    }
     public List<Account> getAllAccounts(){
         return accountRepository.findAll();
     }
@@ -228,4 +225,3 @@ public class AccountService {
         accountRepository.save(account);
     }
 }
-
