@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -56,7 +55,7 @@ class AccountTest {
 
     @Test
     public void getUserIdShouldReturnUserId() {
-        assertEquals(1L, account.getUserId());
+        assertEquals(1L, account.getUser());
     }
 
 }
