@@ -7,6 +7,7 @@ package io.swagger.api;
 
 import io.swagger.model.Account;
 import io.swagger.model.DTO.AccountDTO;
+import io.swagger.model.DTO.UpdateAccountDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -40,79 +41,79 @@ import java.util.Map;
 public interface AccountsApi {
 
     @Operation(summary = "Create a new bank account", description = "Employee method, creates a new bank account", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Account successfully created", content = @Content(schema = @Schema(implementation = Account.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account successfully created", content = @Content(schema = @Schema(implementation = Account.class))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input given"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(value = "/accounts",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.POST)
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.POST)
     ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody AccountDTO accountDTO);
 
 
     @Operation(summary = "Get the specified account", description = "", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Account successfully returned", content = @Content(schema = @Schema(implementation = Account.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account successfully returned", content = @Content(schema = @Schema(implementation = Account.class))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input given"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(value = "/accounts/{iban}",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
+            produces = { "application/json" },
+            method = RequestMethod.GET)
     ResponseEntity<Account> getAccountByIban(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban) throws Exception;
 
 
     @Operation(summary = "Get a list of all bank accounts", description = "Employee method, returns all bank accounts", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Accounts successfully returned", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Account.class)))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accounts successfully returned", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Account.class)))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input given"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(value = "/accounts",
-        produces = { "application/json" }, 
-        method = RequestMethod.GET)
+            produces = { "application/json" },
+            method = RequestMethod.GET)
     ResponseEntity<List<Account>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) LocalDate createdDate);
+    )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
+    )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) LocalDate createdDate);
 
 
     @Operation(summary = "Update account details", description = "Employee Method, update details of the specified account", security = {
-        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
-    @ApiResponses(value = { 
-        @ApiResponse(responseCode = "200", description = "Account successfully updated", content = @Content(schema = @Schema(implementation = Account.class))),
-        
-        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-        
-        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-        
-        @ApiResponse(responseCode = "403", description = "Forbidden"),
-        
-        @ApiResponse(responseCode = "404", description = "Requested object not found") })
+            @SecurityRequirement(name = "bearerAuth")    }, tags={ "Accounts" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Account successfully updated", content = @Content(schema = @Schema(implementation = Account.class))),
+
+            @ApiResponse(responseCode = "400", description = "Invalid input given"),
+
+            @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
+
+            @ApiResponse(responseCode = "403", description = "Forbidden"),
+
+            @ApiResponse(responseCode = "404", description = "Requested object not found") })
     @RequestMapping(value = "/accounts/{iban}",
-        produces = { "application/json" }, 
-        consumes = { "application/json" }, 
-        method = RequestMethod.PUT)
-    ResponseEntity<Account> updateAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody Account body);
+            produces = { "application/json" },
+            consumes = { "application/json" },
+            method = RequestMethod.PUT)
+    ResponseEntity<Account> updateAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UpdateAccountDTO updateAccountDTO) throws Exception;
 
 }
 
