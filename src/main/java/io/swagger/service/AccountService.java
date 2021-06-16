@@ -12,14 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
-import javax.persistence.EntityNotFoundException;
 import javax.persistence.GeneratedValue;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -70,21 +68,23 @@ public class AccountService {
     }
 
     public Account getAccountByIban(String iban) throws Exception {
-        Account account = Optional.ofNullable(accountRepository.getAccountByIban(iban))
-                .orElseThrow(() -> new EntityNotFoundException("Account does not exist"));
+        Account account = accountRepository.getAccountByIban(iban);
 
+        if(account==null){
+            throw new Exception("Account does not exist");
+        }
         return account;
     }
 
-    public boolean getAccountByIbanUserAuthorized(String iban) throws Exception {
+    //makes sure a customer can only retrieve his own accounts
+    public Account getAccountByIbanWithSecurity(String iban) throws Exception {
         if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
-            return false;
+            throw new Exception("User not authorized");
         }
         else{
-            return true;
+            return getAccountByIban(iban);
         }
     }
-
     public Account createAccount(AccountDTO accountDTO){
 
         ModelMapper modelMapper = new ModelMapper();

@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
-import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -58,8 +57,6 @@ public class TransactionService {
         ModelMapper modelMapper = new ModelMapper();
         Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
 
-        checkIfAmountIsLegit(transaction.getAmount().doubleValue());
-
         Account senderAccount = accountService.getAccountByIban(transaction.getSender());
         User senderUser = userRepository.getOne(senderAccount.getUserId());
         Account receiverAccount = accountService.getAccountByIban(transaction.getReceiver());
@@ -68,15 +65,11 @@ public class TransactionService {
         //checks
         checkIfAccountsAreTheSame(senderAccount, receiverAccount);
         checkIfAccountsAreOpen(senderAccount, receiverAccount);
+        checkIfUserPerformingIsPermitted(userPerforming, senderUser);
+        checkLimits(transaction, senderAccount, senderUser);
 
+        //filling properties
         transaction.setTransactionType(checkTransactionType(senderAccount, receiverAccount));
-
-        //don't check limits for deposits/withdrawals
-        if(transaction.getTransactionType()==TransactionType.TRANSACTION){
-            checkLimits(transaction, senderAccount, senderUser);
-        }
-
-        //filling rest of properties
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setUserPerforming(userPerforming.getId());
 
@@ -84,15 +77,10 @@ public class TransactionService {
         accountService.addToBalance(receiverAccount, transaction.getAmount());
         accountService.subtractFromBalance(senderAccount, transaction.getAmount());
 
+        System.out.println("Sender: " + senderAccount.getBalance() + " receiver: " + receiverAccount.getBalance() );
+
         log.info("Transaction successfully created");
         return transactionRepository.save(transaction);
-    }
-
-    private void checkIfAmountIsLegit(double amount){
-        if(amount < 0.01){
-            log.error("User entered illegal amount value");
-            throw new IllegalArgumentException("Invalid amount");
-        }
     }
 
     private TransactionType checkTransactionType(Account sender, Account receiver){
@@ -116,32 +104,28 @@ public class TransactionService {
         }
     }
 
-    public boolean IsUserPerformingIsPermitted(String senderIban) throws Exception {
-        Account senderAccount = accountService.getAccountByIban(senderIban);
-        User senderUser = userRepository.getOne(senderAccount.getUserId());
-        User userPerforming = userService.findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
-
+    private void checkIfUserPerformingIsPermitted(User userPerforming, User senderUser){
         //check if user is employee
         if(!userService.IsLoggedInUserEmployee()){
             //check if user is sender
             if(!userPerforming.getId().equals(senderUser.getId())){
-                return false;
+                log.error("User not employee, and not the owner of sending account");
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the sender");
             }
         }
-        return true;
     }
 
     private void checkIfAccountsAreTheSame(Account sender, Account receiver){
         if(sender == receiver){
             log.error("User tried sending money to same account");
-            throw new IllegalArgumentException("Can't send money to same account");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't send money to same account");
         }
     }
 
     private void checkIfAccountsAreOpen(Account sender, Account receiver){
         if(!sender.isOpen() || !receiver.isOpen()){
             log.error("User tried sending money to a closed account");
-            throw new EntityNotFoundException("Can't transfer to/from closed accounts");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't transfer to/from closed accounts");
         }
     }
 
@@ -149,7 +133,7 @@ public class TransactionService {
         //transactionlimit
         if(transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()){
             log.error("User exceed transaction limit");
-            throw new IllegalArgumentException("Amount exceeded transaction limit");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded transaction limit");
         }
 
         //daylimit
@@ -159,13 +143,13 @@ public class TransactionService {
         }
         if(spentMoneyToday > senderUser.getDayLimit().doubleValue()){
             log.error("User exceeded day limit");
-            throw new IllegalArgumentException("Amount exceeded day limit");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded day limit");
         }
 
         //balance limit
         if(senderAccount.getBalance().doubleValue() - transaction.getAmount().doubleValue() < senderAccount.getAbsoluteLimit().doubleValue()){
             log.error("Account balance too low");
-            throw new IllegalArgumentException("Balance too low");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
         }
     }
 
