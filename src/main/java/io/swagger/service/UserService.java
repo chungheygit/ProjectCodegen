@@ -1,7 +1,6 @@
 package io.swagger.service;
 
 import io.swagger.model.DTO.LoginDTO;
-import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
@@ -18,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -85,7 +85,7 @@ public class UserService {
 
             return "Bearer " + jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
         }catch (AuthenticationException exception){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "email/password invalid");
+            throw new EntityNotFoundException("email/password invalid");
         }
 
     }
@@ -103,7 +103,7 @@ public class UserService {
     public Boolean IsIbanFromLoggedInUser(String iban){
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
         try{
-            if(accountService.getAccountByIban(iban).getUserId() == currentUser.getId()){
+            if(accountService.getAccountByIban(iban).getUser() == currentUser.getId()){
                 return true;
             }
         }catch (Exception e){
