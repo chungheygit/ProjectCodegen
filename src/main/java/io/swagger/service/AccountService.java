@@ -3,11 +3,14 @@ package io.swagger.service;
 import io.swagger.model.Account;
 import io.swagger.model.AccountType;
 import io.swagger.model.DTO.AccountDTO;
+import io.swagger.model.DTO.UpdateAccountDTO;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.MyUserDetailsService;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -34,12 +37,16 @@ public class AccountService {
     @Autowired
     private MyUserDetailsService myUserDetailsService;
 
-    // List of all IBANs saved to just use any IBAN one time
-    ArrayList<String> usedIBANs;
+
+    String bank = "NL01INHO0000000001";
+
+
+    UpdateAccountDTO updateAccountDTO;
+    private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
     public AccountService() {
 
-        usedIBANs = new ArrayList<>();
+        updateAccountDTO = new UpdateAccountDTO();
 
     }
     public List<Account> getAllAccounts(){
@@ -53,20 +60,55 @@ public class AccountService {
 
         return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
     }
-    public Account updateAccount(Account account) throws Exception
+    public Account updateAccount(String iban, UpdateAccountDTO updateAccountDTO) throws Exception
     {
-        User user = new User();
-        String Iban = account.getIban();
 
-        if (Iban == null)
+        Account accountToUpdate = getAccountByIban(iban);
+        // --------------CHECKEN--------------------
+        // Rekening van de bank mag niet upgedated worden.
+        if (accountToUpdate.getIban() == bank)
         {
-            throw new Exception("Account does not exist");
+            throw new Exception("Bank account cannot be updated");
         }
-        account.setIban(account.getIban());
 
-        return  accountRepository.save(account);
+        //  1- check of BALANCE is niet negatief-- werkt
+        if (updateAccountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
+        {
+            throw new Exception("Balance cannot be negative ! ");
+        }
+        //  2- check of ABSOLUTE-LIMIT niet negatief is
+        if (updateAccountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO)  < 0)
+        {
+            throw new Exception("Balance cannot be negative ! ");
+        }
+
+        // 4- Accounttype returnt een null waarde als niet de uiste enum wordt ingevoerd
+        if (updateAccountDTO.getAccountType() == null)
+        {
+            // default zetten we de accountyype current
+            updateAccountDTO.setAccountType(AccountType.CURRENT);
+        }
+
+        // ---------------VULLEN-----------------
+        accountToUpdate.setAccountType(updateAccountDTO.getAccountType());
+        accountToUpdate.setOpen(updateAccountDTO.getOpen());
+        accountToUpdate.setAbsoluteLimit(updateAccountDTO.getAbsoluteLimit());
+        accountToUpdate.setBalance(updateAccountDTO.getBalance());
+
+
+
+        //-------------OPSLAAN EN RETURNEN--------
+        return  accountRepository.save(accountToUpdate);
 
     }
+//    public void checkIfBalanceIsNegative()
+//    {
+//        if (updateAccountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
+//        {
+//            log.error("Balance cannot be negative ! ");
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance cannot be negative ! ");
+//        }
+//    }
     public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
         return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
     }
@@ -89,15 +131,39 @@ public class AccountService {
             return getAccountByIban(iban);
         }
     }
-    public Account createAccount(AccountDTO accountDTO){
+    public Account createAccount(AccountDTO accountDTO) throws Exception {
 
         ModelMapper modelMapper = new ModelMapper();
         Account account = modelMapper.map(accountDTO, Account.class);
 
 
+        //  2- check of Absolut limit is niet negatief
+        if (accountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO)  < 0)
+        {
+            throw new Exception("Balance cannot be negative ! ");
+        }
+        //  2- check of Absolut limit is niet negatief
+        if (accountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
+        {
+            throw new Exception("Balance cannot be negative ! ");
+        }
+        // 4- Accounttype returnt een null waarde als niet de juiste enum wordt ingevoerd
+        if (accountDTO.getAccountType() == null)
+        {
+            // default zetten we de accountyype current
+            accountDTO.setAccountType(AccountType.CURRENT);
+        }
+
+        // check if used id is used
+//        if (userExist(accountDTO.getUserId()) == true)
+//        {
+//            throw new Exception("User ID is already used, please use other user ID ");
+//        }
         // filling properties
         account.setIban(generateIban());
         account.setCreatedDate(java.time.LocalDate.now());
+
+
 
 
          return accountRepository.save(account);
@@ -125,6 +191,15 @@ public class AccountService {
     public boolean accountExist(String iban) {
         return (accountRepository.getAccountByIban(iban) != null);
     }
+
+    // check if user exists
+    public boolean userExist(Long userID) {
+        return (userRepository.getOne(userID)!= null);
+    }
+
+
+
+
 //    public User checkIfUserIdIsUsed(User userId) throws Exception {
 //        Integer LastUserId = userService.getAllUsers(100,0).size()-1;
 //        if (userId.id() == LastUserId || userId.id() < LastUserId){

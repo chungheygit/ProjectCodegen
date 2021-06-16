@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 public class AccountDTO {
 
-    private Integer userId;
+    private Long userId;
     private String iban;
     private LocalDate createdDate;
     private Boolean open;
@@ -32,10 +32,10 @@ public class AccountDTO {
         this.accountType = accountType;
     }
 
-    public Integer getUserId() {
+    public Long getUserId() {
         return userId;
     }
-    public void setUserId(Integer userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
     public String getIban() {
