@@ -92,7 +92,7 @@ public class UserService {
 
     public Boolean IsLoggedInUserEmployee(){
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
-        if(currentUser.getUserType() == UserType.ROLE_Employee){
+        if(currentUser.getUserType() == UserType.ROLE_EMPLOYEE){
             return true;
         }
         else{
