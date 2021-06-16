@@ -36,18 +36,20 @@ public class AccountService {
     UserService userService;
     @Autowired
     private MyUserDetailsService myUserDetailsService;
+    @Autowired
+    UpdateAccountDTO updateAccountDTO;
 
 
     String bank = "NL01INHO0000000001";
 
 
-    UpdateAccountDTO updateAccountDTO;
+
     private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
-    public AccountService() {
+    public AccountService() { }
 
-        updateAccountDTO = new UpdateAccountDTO();
-
+    public List<Account> getAccountsByUserId (Long userId) {
+        return accountRepository.getAccountByUserId(userId);
     }
     public List<Account> getAllAccounts(){
         return accountRepository.findAll();

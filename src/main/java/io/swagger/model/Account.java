@@ -6,6 +6,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.service.UserService;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 
@@ -31,7 +32,7 @@ import javax.validation.constraints.*;
 public class Account   {
 
   @JsonProperty("userId")
-  private Long userId = null;
+  private User user = null;
 
   @Id
   @JsonProperty("iban")
@@ -53,13 +54,13 @@ public class Account   {
   @JsonProperty("open")
   private Boolean open = null;
 
-  public Account userId(Long userId) {
-    this.userId = userId;
+  public Account userId(User user) {
+    this.user = user;
     return this;
   }
 
   public Account(Long userId, String iban, BigDecimal balance, java.time.LocalDate createdDate, AccountType accountType, BigDecimal absoluteLimit, Boolean open) {
-    this.userId = userId;
+    setUser(userId);
     this.iban = iban;
     this.balance = balance;
     this.createdDate = createdDate;
@@ -79,12 +80,13 @@ public class Account   {
   @Schema(required = true, description = "")
       @NotNull
 
-  @Min(1L)  public Long getUserId() {
-    return userId;
+  @Min(1L)  public User getUser() {
+    return user;
   }
 
-  public void setUserId(Long userId) {
-    this.userId = userId;
+  public void setUser(Long userId) {
+    UserService userService = new UserService();
+    this.user = userService.getUserById(userId);
   }
 
   public Account iban(String iban) {
@@ -220,7 +222,7 @@ public class Account   {
       return false;
     }
     Account account = (Account) o;
-    return Objects.equals(this.userId, account.userId) &&
+    return Objects.equals(this.user, account.user) &&
         Objects.equals(this.iban, account.iban) &&
         Objects.equals(this.balance, account.balance) &&
         Objects.equals(this.createdDate, account.createdDate) &&
@@ -231,7 +233,7 @@ public class Account   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(userId, iban, balance, createdDate, accountType, absoluteLimit, open);
+    return Objects.hash(user, iban, balance, createdDate, accountType, absoluteLimit, open);
   }
 
   @Override
@@ -239,7 +241,7 @@ public class Account   {
     StringBuilder sb = new StringBuilder();
     sb.append("class Account {\n");
     
-    sb.append("    userId: ").append(toIndentedString(userId)).append("\n");
+    sb.append("    userId: ").append(toIndentedString(user)).append("\n");
     sb.append("    iban: ").append(toIndentedString(iban)).append("\n");
     sb.append("    balance: ").append(toIndentedString(balance)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");

@@ -25,21 +25,17 @@ import java.util.List;
 @Component
 public class MyApplicationRunner implements ApplicationRunner {
 
-
-    //Add all repositories here and in constructor (or @Autowired)
     @Autowired
     private TransactionRepository transactionRepository;
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private AccountRepository accountRepository;
-
     @Autowired
     private UserService userService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        ////bank moet account hebben
 
         // Create users
         List<User> users =
