@@ -18,5 +18,8 @@ public interface AccountRepository extends JpaRepository<Account,Long> {
 
     @Query(value = "select * from Account  where created_date =?1  limit ?3 offset ?2 " , nativeQuery = true)
     public List<Account> getAccountByCreatedDate(LocalDate createdDate, Integer offset, Integer limit);
+
+    @Query(value = "SELECT * FROM Account  WHERE user_Id =?1 " , nativeQuery = true)
+    List<Account> getAccountByUserId(Long userId);
 }
 

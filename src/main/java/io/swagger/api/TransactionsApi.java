@@ -88,26 +88,5 @@ public interface TransactionsApi {
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "The transaction ID", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId);
-
-
-//    @Operation(summary = "Returns all transactions from an account", description = "", security = {
-//        @SecurityRequirement(name = "bearerAuth")    }, tags={ "Transactions" })
-//    @ApiResponses(value = {
-//        @ApiResponse(responseCode = "200", description = "All transactions are successfully returned", content = @Content(array = @ArraySchema(schema = @Schema(implementation = Transaction.class)))),
-//
-//        @ApiResponse(responseCode = "400", description = "Invalid input given"),
-//
-//        @ApiResponse(responseCode = "401", description = "Unauthorized action attempted"),
-//
-//        @ApiResponse(responseCode = "403", description = "Forbidden"),
-//
-//        @ApiResponse(responseCode = "404", description = "Requested object not found") })
-//    @RequestMapping(value = "/transactions/trigger/{iban}",
-//        produces = { "application/json" },
-//        method = RequestMethod.GET)
-//    ResponseEntity<List<Transaction>> getTransactionsByIban(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-//)) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-//)) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date" ,schema=@Schema()) @Valid @RequestParam(value = "startDate", required = false) LocalDate startDate, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date" ,schema=@Schema()) @Valid @RequestParam(value = "endDate", required = false) LocalDate endDate);
-
 }
 

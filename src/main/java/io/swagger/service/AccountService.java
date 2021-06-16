@@ -12,12 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.GeneratedValue;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -39,6 +41,9 @@ public class AccountService {
 
         usedIBANs = new ArrayList<>();
 
+    }
+    public List<Account> getAccountsByUserId (Long userId) {
+        return accountRepository.getAccountByUserId(userId);
     }
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
@@ -68,23 +73,21 @@ public class AccountService {
     }
 
     public Account getAccountByIban(String iban) throws Exception {
-        Account account = accountRepository.getAccountByIban(iban);
+        Account account = Optional.ofNullable(accountRepository.getAccountByIban(iban))
+                .orElseThrow(() -> new EntityNotFoundException("Account does not exist"));
 
-        if(account==null){
-            throw new Exception("Account does not exist");
-        }
         return account;
     }
 
-    //makes sure a customer can only retrieve his own accounts
-    public Account getAccountByIbanWithSecurity(String iban) throws Exception {
+    public boolean getAccountByIbanUserAuthorized(String iban) throws Exception {
         if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
-            throw new Exception("User not authorized");
+            return false;
         }
         else{
-            return getAccountByIban(iban);
+            return true;
         }
     }
+
     public Account createAccount(AccountDTO accountDTO){
 
         ModelMapper modelMapper = new ModelMapper();

@@ -33,7 +33,6 @@ public class MyApplicationRunner implements ApplicationRunner {
     private UserRepository userRepository;
     @Autowired
     private AccountRepository accountRepository;
-
     @Autowired
     private UserService userService;
 

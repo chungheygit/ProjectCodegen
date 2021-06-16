@@ -1,6 +1,7 @@
 package io.swagger.api;
 
 import io.swagger.model.DTO.LoginDTO;
+import io.swagger.model.DTO.UserDTO;
 import io.swagger.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.service.AccountService;
@@ -107,29 +108,38 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<String>(userService.login(body), HttpStatus.OK);
     }
 
+    //@PreAuthorize("hasRole('Employee')")
     public ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Long userId, @Valid @RequestBody User body) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            if(!userService.IsLoggedInUserEmployee()){
-                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
-            }
-            //userid of our bank is 0
-            if(userId==0){
-                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
-            }
-            try {
-                    User targetUser = userService.getUserById(userId);
+    )) @PathVariable("userId") Long userId, @Valid @RequestBody UserDTO targetUser) {
 
-            } catch (Exception e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
-            }
-            body.setId(Long.valueOf(userId.longValue()));
-            return new ResponseEntity<User>(userService.updateUser(body), HttpStatus.OK);
+        // check if userId is a long and not negative
+        // Mag niet UserId van ons bank zijn
+        // target user ophalen
+        //targetuser updaten maar valideer eerst alle dingen
+
+
+        //DIT IS HARDCODED, DIT MOET IK VERANDERN NAAR CONSTANTE OFZO
+        if(!userService.IsLoggedInUserEmployee() || userId==0) {
+            return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
         }
 
-        return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+        //input must be a Long and a positive number
+        if (userId != (long)userId || userId < 0){
+            return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
+        }
+
+        //check if user exist
+        if(userService.getUserById(userId) == null){
+            return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
+        }
+
+        //try to update user
+        try{
+            return new ResponseEntity<User>(userService.updateUser(userId,targetUser), HttpStatus.OK);
+        }
+        catch (Exception e){
+            return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
+        }
     }
 
 }

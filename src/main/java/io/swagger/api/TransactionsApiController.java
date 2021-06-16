@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -49,7 +50,13 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     public ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionDTO transactionDTO) throws Exception {
-        return new ResponseEntity<Transaction>(transactionService.createTransaction(transactionDTO), HttpStatus.CREATED);
+        if(!transactionService.IsUserPerformingIsPermitted(transactionDTO.getSender())){
+            log.error("User not employee, and not the owner of sending account");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the sender");
+        }
+        else {
+            return new ResponseEntity<Transaction>(transactionService.createTransaction(transactionDTO), HttpStatus.CREATED);
+        }
     }
 
     public ResponseEntity<List<Transaction>> getAllTransactions(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
@@ -71,16 +78,27 @@ public class TransactionsApiController implements TransactionsApi {
         return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_IMPLEMENTED);
     }
     public ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "The transaction ID", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId) {
-        String accept = request.getHeader("Accept");
-        if (accept != null && accept.contains("application/json")) {
-            try {
-                return new ResponseEntity<Transaction>(transactionService.getTransactionById(transactionId),HttpStatus.OK);
-            } catch (IllegalArgumentException e) {
-                log.error("Couldn't serialize response for content type application/json", e);
-                return new ResponseEntity<Transaction>(HttpStatus.NOT_FOUND);
-            }
+
+        //INPUT MOET INTEGER ZIJN anders BAD REQUEST It must be a non-negative number
+        //DIT IS ZOWEL EMPLOYEE ALS CUSTOMER ENDPOINT
+        //CUSTOMER KAN ALLEEN EIGEN TRANSACTIE ZIEN. ANDERE TRANSACTIES UNAUTORIZED
+        //ALS NIKS GEVONDEN NOTFOUND
+
+        //input must be a integer and a positive number
+        if (transactionId != (int)transactionId || transactionId < 0){
+            return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<Transaction>(HttpStatus.NOT_IMPLEMENTED);
+        //Customer kan only view its own transaction, employee can view all transaction
+        if(!userService.IsLoggedInUserEmployee() && !transactionService.isTransactionFromLoggedInUser(transactionId)){//methode that checks if transaction is from user
+            return new ResponseEntity<Transaction>(HttpStatus.UNAUTHORIZED);
+        }
+
+        //EXECPTION E MOET WEG!!!!!
+        try {
+            return new ResponseEntity<Transaction>(transactionService.getTransactionById(transactionId),HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<Transaction>(HttpStatus.NOT_FOUND);
+        }
     }
 }
