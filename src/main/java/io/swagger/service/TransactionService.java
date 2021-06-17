@@ -10,15 +10,11 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.threeten.bp.OffsetDateTime;
 
 import javax.persistence.EntityNotFoundException;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -153,7 +149,7 @@ public class TransactionService {
         }
 
         //daylimit
-        Double spentMoneyToday = transactionRepository.getSpentMoneyByDate(senderAccount.getIban(), LocalDate.now());
+        Double spentMoneyToday = transactionRepository.getSpentTransactionMoneyByDate(senderAccount.getIban(), LocalDate.now());
         if(spentMoneyToday==null){
             spentMoneyToday = 0.00;
         }
