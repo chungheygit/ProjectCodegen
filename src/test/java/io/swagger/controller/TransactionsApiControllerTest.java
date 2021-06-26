@@ -89,4 +89,20 @@ public class TransactionsApiControllerTest {
                         "}"))
                 .andExpect(status().isCreated());
     }
+
+    @Test
+    @WithMockUser(roles = "Employee")
+    public void whenCreateTransactionWithWrongJsonShouldReturnBadRequest() throws Exception {
+        given(transactionService.IsUserPerformingIsPermitted("NL58INHO0123456788")).willReturn(true);
+        mvc.perform(post("/transactions/")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content("{\n" +
+                        "  \"amount\"::::: 10,\n" +
+                        "  \"description\": \"hoi\",\n" +
+                        "  \"receiver\": \"NL58INHO0123456789\",\n" +
+                        "  \"sender\": \"NL58INHO0123456788\"\n" +
+                        "}"))
+                .andExpect(status().isBadRequest());
+    }
+
 }
