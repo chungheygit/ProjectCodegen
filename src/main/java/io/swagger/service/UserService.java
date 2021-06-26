@@ -1,7 +1,7 @@
 package io.swagger.service;
 
+import io.swagger.api.NotFoundException;
 import io.swagger.model.DTO.LoginDTO;
-import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
@@ -43,114 +43,65 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    // Get all users (With limit en offset)
+    // Get all users (With limit and offset)
     public List<User> getAllUsers(Integer limit, Integer offset) throws Exception {
-        List<User> allUsers = userRepository.findAll();
-
-        if(allUsers.size() == 0){   	return allUsers;       } //No users found
-
-        //apply pagination with/to offset and limit
-        allUsers = createPageable(offset, limit, allUsers);
-
-        return allUsers;
+        return userRepository.getUsersByFilters(limit, offset);
     }
 
     // Get a user by its ID
-    public User getUserById (long id){
-        return userRepository
-            .findById(id)
-            .orElseThrow(() ->  new IllegalArgumentException());
+    public User getUserById(long id) throws NotFoundException {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(404, "No user found with userId " + id));
     }
 
     // Get all users by mail
-    public User findUserByEmail(String email) { return userRepository.findUserByEmail(email); }
-
-    public User createUser (User user){
-        if(userRepository.findUserByEmail(user.getEmail()) == null) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
-            return userRepository.save(user);
-        }
-        else{
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "Email/password invalid");
-        }
+    public User findUserByEmail(String email) {
+        return userRepository.findUserByEmail(email);
     }
 
-    public User updateUser(User targetUser) { return userRepository.save(targetUser); }
+    public User createUser(User user) {
+        //Encrypt password
+        if (userRepository.findUserByEmail(user.getEmail()) == null)
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
 
-    public String login(LoginDTO loginDTO){
-        try{
+    public User updateUser(User targetUser) {
+        return userRepository.save(targetUser);
+    }
+
+    public String login(LoginDTO loginDTO) {
+        try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
 
             User user = userRepository.findUserByEmail(loginDTO.getEmail());
 
             return "Bearer " + jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
-        }catch (AuthenticationException exception){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "email/password invalid");
+        } catch (AuthenticationException exception) {
+            // 403: Unauthorized client error status response code indicates that the request has not been applied because it lacks valid authentication credentials for the target resource
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "email/password invalid");
         }
 
     }
 
-    public Boolean IsLoggedInUserEmployee(){
+    public Boolean IsLoggedInUserEmployee() {
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
-        if(currentUser.getUserType() == UserType.ROLE_Employee){
+        if (currentUser.getUserType() == UserType.ROLE_Employee) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
 
-    public Boolean IsIbanFromLoggedInUser(String iban){
+    public Boolean IsIbanFromLoggedInUser(String iban) {
         User currentUser = findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
-        try{
-            if(accountService.getAccountByIban(iban).getUserId() == currentUser.getId()){
+        try {
+            if (accountService.getAccountByIban(iban).getUserId() == currentUser.getId()) {
                 return true;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Exception: " + e);
         }
         return false;
     }
-
-
-    /**
-     * Apply Pagination
-     * @param offset
-     * @param limit
-     * @param allUsers
-     * @return
-     * @throws Exception
-     */
-    private List<User> createPageable(Integer offset, Integer limit, List<User> allUsers) throws Exception{
-
-        if(limit == null && offset == null){
-            // No pagination
-            return allUsers;
-        }
-
-        int size = allUsers.size();
-        if (offset == null) {
-            offset = 0;
-        }
-        if (limit == null) {
-            limit = size;
-        }
-        if (limit <= 0) {
-            throw new Exception("limit can't be zero or negative");
-        }
-
-        if (offset < 0) {
-            throw new Exception("offset can't be  negative");
-        }
-
-        limit = offset + limit ;
-
-        if(limit > size) { limit  = size;}
-        if(offset > size){ offset = size;}
-
-        allUsers= allUsers.subList(offset, limit);
-
-        return allUsers;
-    }
-
 }
