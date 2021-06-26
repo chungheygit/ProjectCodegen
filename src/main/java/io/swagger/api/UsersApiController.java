@@ -103,8 +103,8 @@ public class UsersApiController implements UsersApi {
         }
     }
 
-    public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO body) {
-        return new ResponseEntity<String>(userService.login(body), HttpStatus.OK);
+    public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO) {
+        return new ResponseEntity<String>(userService.login(loginDTO), HttpStatus.OK);
     }
 
     public ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }

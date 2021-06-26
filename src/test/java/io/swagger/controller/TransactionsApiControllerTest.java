@@ -92,7 +92,7 @@ public class TransactionsApiControllerTest {
 
     @Test
     @WithMockUser(roles = "Employee")
-    public void whenCreateTransactionWithWrongJsonShouldReturnBadRequest() throws Exception {
+    public void whenCreateTransactionWithInvalidJsonShouldReturnBadRequest() throws Exception {
         given(transactionService.IsUserPerformingIsPermitted("NL58INHO0123456788")).willReturn(true);
         mvc.perform(post("/transactions/")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
