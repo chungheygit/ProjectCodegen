@@ -37,7 +37,6 @@ public class AccountService {
     @Autowired
     private MyUserDetailsService myUserDetailsService;
 
-
     String bank = "NL01INHO0000000001";
 
 
@@ -60,114 +59,101 @@ public class AccountService {
 
         return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
     }
+
+    public Account createAccount(AccountDTO accountDTO) throws Exception {
+
+        ModelMapper modelMapper = new ModelMapper();
+        Account account = modelMapper.map(accountDTO, Account.class);
+
+//        validateAccountDTO(accountDTO); // validatie methode in controller
+
+        account.setIban(generateIban()); // iban automatisch genereren en vullen
+        account.setCreatedDate(java.time.LocalDate.now()); // Datum ter plek genereren
+
+         return accountRepository.save(account);
+    }
+    // validate input create account
+    public void validateAccountDTO(AccountDTO accountDTO) throws Exception {
+        if (accountDTO.getBalance().compareTo(BigDecimal.ZERO) < 0) {// check of BALANCE niet negatief is
+            log.error("Balance cannot be negative ! ");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative ! ");
+        }
+        if (accountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO) < 0) {// check of ABSOLUTE-LIMIT niet negatief is
+            log.error("Absolute limit cannot be negative ! ");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Absolute limit cannot be negative ! ");
+        }
+        // checkt of user id is in gebruik
+        CheckUserId(accountDTO);
+
+        if (accountDTO.getAccountType() == null)
+        {
+            log.error("Accounttype has to be 'current' or 'saving' ! ");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accounttype has to be 'current' or 'saving' ! ");
+        }
+
+    }
     public Account updateAccount(String iban, UpdateAccountDTO updateAccountDTO) throws Exception
     {
-
         Account accountToUpdate = getAccountByIban(iban);
-        // --------------CHECKEN--------------------
-        // Rekening van de bank mag niet upgedated worden.
-        if (accountToUpdate.getIban() == bank)
-        {
-            throw new Exception("Bank account cannot be updated");
-        }
 
-        //  1- check of BALANCE is niet negatief-- werkt
-        if (updateAccountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
-        {
-            throw new Exception("Balance cannot be negative ! ");
-        }
-        //  2- check of ABSOLUTE-LIMIT niet negatief is
-        if (updateAccountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO)  < 0)
-        {
-            throw new Exception("Balance cannot be negative ! ");
-        }
+        //validateUpdateAccountDTO(updateAccountDTO);// input validatie in controller
 
-        // 4- Accounttype returnt een null waarde als niet de uiste enum wordt ingevoerd
-        if (updateAccountDTO.getAccountType() == null)
-        {
-            // default zetten we de accountyype current
-            updateAccountDTO.setAccountType(AccountType.CURRENT);
-        }
 
-        // ---------------VULLEN-----------------
+        // de parameters hieronder mogen worden geupdate, andere als Id en Iban blijven vast
         accountToUpdate.setAccountType(updateAccountDTO.getAccountType());
         accountToUpdate.setOpen(updateAccountDTO.getOpen());
         accountToUpdate.setAbsoluteLimit(updateAccountDTO.getAbsoluteLimit());
         accountToUpdate.setBalance(updateAccountDTO.getBalance());
 
 
-
-        //-------------OPSLAAN EN RETURNEN--------
         return  accountRepository.save(accountToUpdate);
-
     }
-//    public void checkIfBalanceIsNegative()
-//    {
-//        if (updateAccountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
-//        {
-//            log.error("Balance cannot be negative ! ");
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance cannot be negative ! ");
-//        }
-//    }
-    public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
-        return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
-    }
+    // validate input update account
+    public void validateUpdateAccountDTO(UpdateAccountDTO updateAccountDTO) throws Exception {
 
-    public Account getAccountByIban(String iban) throws Exception {
-        Account account = accountRepository.getAccountByIban(iban);
-
-        if(account==null){
-            throw new Exception("Account does not exist");
-        }
-        return account;
-    }
-
-    //makes sure a customer can only retrieve his own accounts
-    public Account getAccountByIbanWithSecurity(String iban) throws Exception {
-        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
-            throw new Exception("User not authorized");
-        }
-        else{
-            return getAccountByIban(iban);
-        }
-    }
-    public Account createAccount(AccountDTO accountDTO) throws Exception {
-
-        ModelMapper modelMapper = new ModelMapper();
-        Account account = modelMapper.map(accountDTO, Account.class);
-
-
-        //  2- check of Absolut limit is niet negatief
-        if (accountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO)  < 0)
+        //  check of BALANCE niet negatief is
+        if (updateAccountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
         {
-            throw new Exception("Balance cannot be negative ! ");
+            log.error("Balance cannot be negative ! ");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative ! ");
         }
-        //  2- check of Absolut limit is niet negatief
-        if (accountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
+        if (updateAccountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO) < 0) { //check of ABSOLUTE-LIMIT niet negatief is
+            log.error("Absolute limit cannot be negative ! ");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Absolute limit cannot be negative ! ");
+        }
+        if (updateAccountDTO.getAccountType() == null)
         {
-            throw new Exception("Balance cannot be negative ! ");
+            log.error("Accounttype has to be 'current' or 'saving' ! ");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accounttype has to be 'current' or 'saving' ! ");
         }
-        // 4- Accounttype returnt een null waarde als niet de juiste enum wordt ingevoerd
-        if (accountDTO.getAccountType() == null)
+    }
+    // check if user exists
+    public boolean userExist(Long userID) {
+        return (userRepository.findById(userID)!= null);
+    }
+    public void CheckUserId(AccountDTO accountDTO) throws Exception {
+        // check if user if exists
+        Integer HaveToChooseId = Math.toIntExact(userRepository.findAll().size() + 1);
+        Integer FilledID = Math.toIntExact(accountDTO.getUserId());
+        if (userExist(accountDTO.getUserId()) == true && FilledID < HaveToChooseId)
         {
-            // default zetten we de accountyype current
-            accountDTO.setAccountType(AccountType.CURRENT);
+            log.error("User ID is already in use, please choose "+ HaveToChooseId );
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User ID is already in use, please choose "+ HaveToChooseId);
         }
+    }
 
-        // check if used id is used
-//        if (userExist(accountDTO.getUserId()) == true)
-//        {
-//            throw new Exception("User ID is already used, please use other user ID ");
-//        }
-        // filling properties
-        account.setIban(generateIban());
-        account.setCreatedDate(java.time.LocalDate.now());
-
-
-
-
-         return accountRepository.save(account);
-
+        public Boolean EnumStartsWith(AccountDTO accountDTO)
+       {
+           String Type = accountDTO.getAccountType().toString();
+           if (Type.startsWith("s"))
+           {
+               accountDTO.setAccountType(AccountType.SAVINGS);
+           }
+           return true;
+       }
+    // check if accounts exists
+    public boolean accountExist(String iban) {
+        return (accountRepository.getAccountByIban(iban) != null);
     }
 
     public String generateIban(){
@@ -187,17 +173,6 @@ public class AccountService {
         }
         return IBAN;
     }
-    // check if accounts exists
-    public boolean accountExist(String iban) {
-        return (accountRepository.getAccountByIban(iban) != null);
-    }
-
-    // check if user exists
-    public boolean userExist(Long userID) {
-        return (userRepository.getOne(userID)!= null);
-    }
-
-
 
 
 //    public User checkIfUserIdIsUsed(User userId) throws Exception {
@@ -207,13 +182,10 @@ public class AccountService {
 //        }
 //        return userId;
 //    }
-//    public void checkIfIbanIsFilledLikeIban(String Iban)
-//    {
-//        Account account = new Account();
-//        String filledIban = account.getIban();
-//        if (filledIban != account.getIban().)
-//    }
 
+    public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
+        return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);
+    }
 
     protected void addToBalance(Account account, BigDecimal amount){
         account.setBalance(account.getBalance().add(amount));
@@ -223,6 +195,24 @@ public class AccountService {
     protected void subtractFromBalance(Account account, BigDecimal amount){
         account.setBalance(account.getBalance().subtract(amount));
         accountRepository.save(account);
+    }
+
+    public Account getAccountByIban(String iban) throws Exception {
+        Account account = accountRepository.getAccountByIban(iban);
+
+        if(account==null){
+            throw new Exception("Account does not exist");
+        }
+        return account;
+    }
+    //makes sure a customer can only retrieve his own accounts
+    public Account getAccountByIbanWithSecurity(String iban) throws Exception {
+        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+            throw new Exception("User not authorized");
+        }
+        else{
+            return getAccountByIban(iban);
+        }
     }
 }
 

@@ -55,14 +55,9 @@ public class AccountsApiController implements AccountsApi {
     }
 
     @PreAuthorize("hasRole('Employee')") // access for employee only
-    public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody AccountDTO accountDTO) {
-
-
-        try {
-            return new ResponseEntity<Account>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
-        } catch (Exception e) { ;
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody AccountDTO accountDTO) throws Exception {
+        accountService.validateAccountDTO(accountDTO);
+        return new ResponseEntity<Account>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
 
     }
 
@@ -76,7 +71,6 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<List<Account>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate createdDate) {
-
         try {
             return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountsByCreatedDate(createdDate, offset, limit), HttpStatus.OK);
         } catch (Exception e) {
@@ -88,13 +82,8 @@ public class AccountsApiController implements AccountsApi {
 
     @PreAuthorize("hasRole('Employee')") // access for employee only
     public ResponseEntity<Account> updateAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UpdateAccountDTO updateAccountDTO) throws Exception {
-
-
-            try {
-                return new ResponseEntity<Account>(accountService.updateAccount(iban, updateAccountDTO), HttpStatus.OK);
-            } catch (Exception e) { ;
-                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            }
+        accountService.validateUpdateAccountDTO(updateAccountDTO);
+        return new ResponseEntity<Account>(accountService.updateAccount(iban, updateAccountDTO), HttpStatus.OK);
 
     }
 

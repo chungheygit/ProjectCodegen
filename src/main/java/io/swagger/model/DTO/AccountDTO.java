@@ -9,12 +9,18 @@ import java.time.LocalDate;
 public class AccountDTO {
 
     private Long userId;
-    private String iban;
-    private LocalDate createdDate;
     private Boolean open;
     private BigDecimal absoluteLimit;
     private BigDecimal balance;
     private AccountType accountType;
+
+    public AccountDTO(Long userId, Boolean open, BigDecimal absoluteLimit, BigDecimal balance, AccountType accountType) {
+        this.userId = userId;
+        this.open = open;
+        this.absoluteLimit = absoluteLimit;
+        this.balance = balance;
+        this.accountType = accountType;
+    }
 
     public BigDecimal getBalance() {
         return balance;
@@ -37,18 +43,6 @@ public class AccountDTO {
     }
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-    public String getIban() {
-        return iban;
-    }
-    public void setIban(String iban) {
-        this.iban = iban;
-    }
-    public LocalDate getCreatedDate() {
-        return createdDate;
-    }
-    public void setCreatedDate(LocalDate createdDate) {
-        this.createdDate = createdDate;
     }
     public Boolean getOpen() {
         return open;
