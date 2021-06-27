@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -47,11 +48,28 @@ public class AccountsApiControllerTest {
     }
 
     @Test
-    public void getAllAccountsWithIbanShouldReturnOk() throws Exception {
-        given(service.getAccountByIban("NL58INHO0123456702")).willReturn((Account) accounts);
-        this.mvc.perform(get("/accounts/NL58INHO0123456702")).andExpect(
+    @WithMockUser(roles = "Employee")
+    public void getAccountByIbanShouldReturnOk() throws Exception {
+        Account account = new Account();
+        account.setIban("NL58INHO0123456702");
+        given(service.getAccountByIbanUserAuthorized("NL58INHO0123456702")).willReturn(true);
+        given(service.getAccountByIban("NL58INHO0123456702")).willReturn(account);
+        this.mvc.perform(get("/accounts/NL58INHO0123456702/")).andExpect(
                 status().isOk()).andExpect(jsonPath("iban").value(account.getIban()));
     }
+
+    @Test
+    @WithMockUser(roles = "Customer")
+    public void getAccountByIbanWithUnauthorizedUserReturnsForbidden() throws Exception {
+        Account account = new Account();
+        account.setIban("NL58INHO0123456702");
+        given(service.getAccountByIbanUserAuthorized("NL58INHO0123456702")).willReturn(false);
+        given(service.getAccountByIban("NL58INHO0123456702")).willReturn(account);
+        this.mvc.perform(get("/accounts/NL58INHO0123456702/")).andExpect(
+                status().isForbidden());
+    }
+
+
 
 
 
