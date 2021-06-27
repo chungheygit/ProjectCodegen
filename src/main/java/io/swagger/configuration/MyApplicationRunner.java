@@ -54,7 +54,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         List<Account> accounts =
                 Arrays.asList(
                         new Account(users.get(0).getId(), "NL01INHO0000000001", new BigDecimal(85000000.00 ), java.time.LocalDate.of(1999,9,19), AccountType.CURRENT, new BigDecimal(500000 ), true),
-                        new Account(users.get(1).getId(), "NL58INHO0123456788", new BigDecimal(200 ), java.time.LocalDate.of(2021,4,20), AccountType.CURRENT, new BigDecimal(500 ), true),
+                        new Account(users.get(1).getId(), "NL58INHO0123456788", new BigDecimal(200), java.time.LocalDate.of(2021,4,20), AccountType.CURRENT, new BigDecimal(10 ), true),
                         new Account(users.get(2).getId(), "NL58INHO0123456701", new BigDecimal(6999.25 ), java.time.LocalDate.of(2021,6,1), AccountType.CURRENT, new BigDecimal(500 ), true),
                         new Account(users.get(3).getId(), "NL58INHO0123456702", new BigDecimal(7999.25 ), java.time.LocalDate.of(2021,3,18), AccountType.CURRENT, new BigDecimal(500 ), false),
                         new Account(users.get(4).getId(), "NL58INHO0123456789", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,1,25), AccountType.CURRENT, new BigDecimal(500 ), true)
@@ -72,6 +72,12 @@ public class MyApplicationRunner implements ApplicationRunner {
                         new Transaction(users.get(3).getId(), LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456702", "NL58INHO0123456701", new BigDecimal(500), "loan")
                 );
         transactions.forEach(transactionRepository::save);
-    }
 
+        User user1 = new User("User", "Saving", LocalDate.of(1999,9,19), "user1@gmail.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.00"), new BigDecimal("250.00"), true);
+        userService.createUser(user1);
+        Account user1Saving = new Account(user1.getId(), "NL58INHO0000000089", new BigDecimal(50.25 ), java.time.LocalDate.of(2021,1,25), AccountType.SAVINGS, new BigDecimal(1 ), true);
+        Account user1Current = new Account(user1.getId(), "NL58INHO0000000090", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,1,25), AccountType.CURRENT, new BigDecimal(1 ), true);
+        accountRepository.save(user1Saving);
+        accountRepository.save(user1Current);
+    }
 }

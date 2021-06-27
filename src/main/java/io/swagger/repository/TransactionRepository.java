@@ -39,6 +39,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
     @Query(value = "SELECT * FROM Transaction WHERE SENDER = ?1 OR RECEIVER = ?1 And timestamp <= ?2 limit ?3 offset ?4", nativeQuery = true)
     List<Transaction> getAllTransactionsByIbanAndEndDate(String iban, Timestamp EndDate, Integer limit, Integer offset);
 
-    @Query(value = "SELECT SUM(amount) FROM Transaction WHERE sender = ?1 AND timestamp LIKE ?2%", nativeQuery = true)
-    public Double getSpentMoneyByDate(String iban, LocalDate date);
+    @Query(value = "SELECT SUM(amount) FROM Transaction WHERE sender = ?1 AND timestamp LIKE ?2% AND transaction_type = 'TRANSACTION'", nativeQuery = true)
+    public Double getSpentTransactionMoneyByDate(String iban, LocalDate date);
 }

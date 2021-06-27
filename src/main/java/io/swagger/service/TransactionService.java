@@ -10,12 +10,9 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.PermissionDeniedDataAccessException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import org.threeten.bp.OffsetDateTime;
 
 import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
@@ -61,7 +58,20 @@ public class TransactionService {
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
     }
 
-    public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception {
+
+    public void validateTransactionDTO(TransactionDTO transactionDTO){
+        if(!accountService.validIban(transactionDTO.getSender())){
+            log.error("Invalid iban entered");
+            throw new IllegalArgumentException("Invalid iban entered");
+        }
+        if(!accountService.validIban(transactionDTO.getReceiver())){
+            log.error("Invalid iban entered");
+            throw new IllegalArgumentException("Invalid iban entered");
+        }
+        checkIfAmountIsLegit(transactionDTO.getAmount().doubleValue());
+    }
+
+    public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception{
 
         ModelMapper modelMapper = new ModelMapper();
         Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
@@ -79,6 +89,10 @@ public class TransactionService {
 
         //filling properties
         transaction.setTransactionType(checkTransactionType(senderAccount, receiverAccount));
+
+        checkLimits(transaction, senderAccount, senderUser);
+
+        //filling rest of properties
         transaction.setTimestamp(LocalDateTime.now());
         transaction.setUserPerforming(userPerforming.getId());
 
@@ -96,7 +110,7 @@ public class TransactionService {
         if (sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS) {
             if (!sender.getUserId().equals(receiver.getUserId())) {
                 log.error("User tried transfering to/from savings account from other user");
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden to transfer from/to savings account from another user.");
+                throw new IllegalArgumentException("Forbidden to transfer from/to savings account from another user.");
             } else {
                 if (sender.getAccountType() == AccountType.SAVINGS) {
                     return TransactionType.WITHDRAWAL;
@@ -115,7 +129,7 @@ public class TransactionService {
             //check if user is sender
             if (!userPerforming.getId().equals(senderUser.getId())) {
                 log.error("User not employee, and not the owner of sending account");
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the sender");
+                throw new IllegalArgumentException("You are not the sender");
             }
         }
     }
@@ -123,38 +137,41 @@ public class TransactionService {
     private void checkIfAccountsAreTheSame(Account sender, Account receiver) {
         if (sender == receiver) {
             log.error("User tried sending money to same account");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't send money to same account");
+            throw new IllegalArgumentException("Can't send money to same account");
         }
     }
 
     private void checkIfAccountsAreOpen(Account sender, Account receiver) {
         if (!sender.isOpen() || !receiver.isOpen()) {
             log.error("User tried sending money to a closed account");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't transfer to/from closed accounts");
+            throw new IllegalArgumentException("Can't transfer to/from closed accounts");
         }
     }
 
-    private void checkLimits(Transaction transaction, Account senderAccount, User senderUser) {
-        //transactionlimit
-        if (transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()) {
-            log.error("User exceed transaction limit");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded transaction limit");
-        }
+    private void checkLimits(Transaction transaction, Account senderAccount, User senderUser){
+        //dont check transactionlimit+daylimit on withdrawals and deposits
+        if(transaction.getTransactionType()==TransactionType.TRANSACTION){
+            //transactionlimit
+            if(transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()){
+                log.error("User exceed transaction limit");
+                throw new IllegalArgumentException("Amount exceeded transaction limit");
+            }
 
-        //daylimit
-        Double spentMoneyToday = transactionRepository.getSpentMoneyByDate(senderAccount.getIban(), LocalDate.now());
-        if (spentMoneyToday == null) {
-            spentMoneyToday = 0.00;
-        }
-        if (spentMoneyToday > senderUser.getDayLimit().doubleValue()) {
-            log.error("User exceeded day limit");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded day limit");
+            //daylimit
+            Double spentMoneyToday = transactionRepository.getSpentTransactionMoneyByDate(senderAccount.getIban(), LocalDate.now());
+            if(spentMoneyToday==null){
+                spentMoneyToday = 0.00;
+            }
+            if(spentMoneyToday > senderUser.getDayLimit().doubleValue()){
+                log.error("User exceeded day limit");
+                throw new IllegalArgumentException("Amount exceeded day limit");
+            }
         }
 
         //balance limit
         if (senderAccount.getBalance().doubleValue() - transaction.getAmount().doubleValue() < senderAccount.getAbsoluteLimit().doubleValue()) {
             log.error("Account balance too low");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
+            throw new IllegalArgumentException("Balance too low");
         }
     }
 

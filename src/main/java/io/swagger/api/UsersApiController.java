@@ -114,8 +114,8 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<User>(userService.getUserById(userId),HttpStatus.OK);
     }
 
-    public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO body) {
-        return new ResponseEntity<String>(userService.login(body), HttpStatus.OK);
+    public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO loginDTO) {
+        return new ResponseEntity<String>(userService.login(loginDTO), HttpStatus.OK);
     }
 
     //@PreAuthorize("hasRole('Employee')")

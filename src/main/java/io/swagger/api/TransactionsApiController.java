@@ -53,7 +53,14 @@ public class TransactionsApiController implements TransactionsApi {
     }
 
     public ResponseEntity<Transaction> createTransaction(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody TransactionDTO transactionDTO) throws Exception {
-        return new ResponseEntity<Transaction>(transactionService.createTransaction(transactionDTO), HttpStatus.CREATED);
+        transactionService.validateTransactionDTO(transactionDTO);
+        if(!transactionService.IsUserPerformingIsPermitted(transactionDTO.getSender())){
+            log.error("User not employee, and not the owner of sending account");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not the sender");
+        }
+        else {
+            return new ResponseEntity<Transaction>(transactionService.createTransaction(transactionDTO), HttpStatus.CREATED);
+        }
     }
 
     public ResponseEntity<List<Transaction>> getAllTransactions(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }

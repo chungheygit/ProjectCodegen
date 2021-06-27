@@ -64,3 +64,21 @@ Feature: Create transaction feature
     Then I get status 403 in CreateTransactionSteps
     And I get message containing "Forbidden to transfer from/to savings account from another user." in CreateTransactionSteps
 
+  Scenario: Creating transaction that hits absolute limit returns status 400 and message "Balance too low"
+    When I log in with email "user1@gmail.com" and password "password" for transaction
+    And I create a transaction with sender "NL58INHO0000000089" and receiver "NL58INHO0000000090" and amount 60 and description "test"
+    Then I get status 400 in CreateTransactionSteps
+    And I get message containing "Balance too low" in CreateTransactionSteps
+
+  Scenario: Creating transaction with invalid sender returns 400 and message containing "Invalid iban entered"
+    When I log in with email "user1@gmail.com" and password "password" for transaction
+    And I create a transaction with sender "argoaiejrgoiaejrg" and receiver "NL58INHO0000000090" and amount 60 and description "test"
+    Then I get status 400 in CreateTransactionSteps
+    And I get message containing "Invalid iban entered" in CreateTransactionSteps
+
+  Scenario: Creating transaction with invalid receiver returns 400 and message containing "Invalid iban entered"
+    When I log in with email "user1@gmail.com" and password "password" for transaction
+    And I create a transaction with sender "NL58INHO0000000090" and receiver "wewewewe" and amount 60 and description "test"
+    Then I get status 400 in CreateTransactionSteps
+    And I get message containing "Invalid iban entered" in CreateTransactionSteps
+

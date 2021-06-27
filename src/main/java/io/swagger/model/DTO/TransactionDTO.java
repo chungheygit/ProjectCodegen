@@ -1,7 +1,10 @@
 package io.swagger.model.DTO;
 
+import lombok.AllArgsConstructor;
+
 import java.math.BigDecimal;
 
+@AllArgsConstructor
 public class TransactionDTO {
 
     private String sender;
@@ -47,4 +50,5 @@ public class TransactionDTO {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }

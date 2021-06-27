@@ -5,8 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import io.cucumber.messages.internal.com.google.gson.Gson;
 import io.swagger.model.DTO.LoginDTO;
 import io.swagger.model.DTO.TransactionDTO;
+import io.swagger.model.Transaction;
+
 import io.swagger.model.TransactionType;
 import org.json.JSONException;
 import org.json.JSONObject;

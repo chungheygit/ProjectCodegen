@@ -67,21 +67,30 @@ public class AccountsApiControllerTest {
         given(service.getAllAccounts()).willReturn(accounts);
         this.mvc.perform(get("/accounts/")).andExpect(
                 status().isOk());
+
+    @Test
+    @WithMockUser(roles = "Employee")
+    public void getAccountByIbanShouldReturnOk() throws Exception {
+        Account account = new Account();
+        account.setIban("NL58INHO0123456702");
+        given(service.getAccountByIbanUserAuthorized("NL58INHO0123456702")).willReturn(true);
+        given(service.getAccountByIban("NL58INHO0123456702")).willReturn(account);
+        this.mvc.perform(get("/accounts/NL58INHO0123456702/")).andExpect(
+                status().isOk()).andExpect(jsonPath("iban").value(account.getIban()));
+
     }
 
+    @Test
+    @WithMockUser(roles = "Customer")
+    public void getAccountByIbanWithUnauthorizedUserReturnsForbidden() throws Exception {
+        Account account = new Account();
+        account.setIban("NL58INHO0123456702");
+        given(service.getAccountByIbanUserAuthorized("NL58INHO0123456702")).willReturn(false);
+        given(service.getAccountByIban("NL58INHO0123456702")).willReturn(account);
+        this.mvc.perform(get("/accounts/NL58INHO0123456702/")).andExpect(
+                status().isForbidden());
+    }
 
-//    @Test
-//    @WithMockUser(username = "Employee", password = "employee1", roles = "Employee")
-//    public void EmployeeCreateAccountWithFilledPropertiesShouldReturn201() throws Exception{
-//        given(service.createAccount(accountDTO.getCreatedDate())).willReturn(accountDTO.getCreatedDate());
-//        this.mvc.perform(post("/accounts")
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .content("{\n" +
-//                        "  \"owner\": \"test1\",\n" +
-//                        "  \"type\": \"Current\"\n" +
-//                        "}"))
-//                .andExpect(status().isCreated());
-//    }
     @Test
     @WithMockUser(username = "emp", password = "password", roles = "Employee")
     public void getAccountsByIBANShouldReturnOK() throws Exception {

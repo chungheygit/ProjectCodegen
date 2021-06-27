@@ -29,6 +29,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AccountService {
@@ -195,6 +197,7 @@ public class AccountService {
         accountRepository.save(account);
     }
 
+
     public Account getAccountByIban(String iban) throws Exception {
         Account account = accountRepository.getAccountByIban(iban);
 
@@ -211,6 +214,14 @@ public class AccountService {
         else{
             return getAccountByIban(iban);
         }
+
+    public boolean validIban(String iban) {
+        Pattern pattern = Pattern.compile("NL\\d{2}INHO(\\d{10}|\\d{9})");
+        Matcher matcher = pattern.matcher(iban);
+        if(matcher.matches()){
+            return true;
+        }
+        return false;
     }
 }
 

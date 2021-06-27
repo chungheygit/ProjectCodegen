@@ -69,7 +69,18 @@ public class AccountsApiController implements AccountsApi {
 
 
     public ResponseEntity<Account> getAccountByIban(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban) throws Exception {
-        return new ResponseEntity<Account>(accountService.getAccountByIbanWithSecurity(iban), HttpStatus.OK);
+        if(!accountService.validIban(iban)){
+            log.error("User entered invalid iban");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid iban entered");
+        }
+        //employee or owner of iban allowed
+        if(!accountService.getAccountByIbanUserAuthorized(iban)){
+            log.error("User not authorized");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User not authorized");
+        }
+        else{
+            return new ResponseEntity<Account>(accountService.getAccountByIban(iban), HttpStatus.OK);
+        }
     }
 
     @PreAuthorize("hasRole('Employee')") // access for employee only
