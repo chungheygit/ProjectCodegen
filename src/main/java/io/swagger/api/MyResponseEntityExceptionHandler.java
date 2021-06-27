@@ -12,7 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class MyResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
+public class  MyResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Order(2)
     @ExceptionHandler(value = {Exception.class})
