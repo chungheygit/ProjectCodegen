@@ -61,6 +61,7 @@ public class AccountsApiController implements AccountsApi {
         accountService.validateBalance(accountDTO.getBalance());
         accountService.validateAbsoluteLimit(accountDTO.getAbsoluteLimit());
         accountService.validateAccounttype(accountDTO.getAccountType());
+        accountService.ValidateBooleanOpen(accountDTO.getOpen());
 
         return new ResponseEntity<Account>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
 
