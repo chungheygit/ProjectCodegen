@@ -11,14 +11,21 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.persistence.EntityNotFoundException;
+
 @ControllerAdvice
 public class MyResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Order(2)
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<Object> handleGenericException(Exception ex, WebRequest request){
-        ExceptionDTO exceptionDTO = new ExceptionDTO(ex.getMessage());
-        return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    @Order(2)
+    @ExceptionHandler(value = {EntityNotFoundException.class})
+    protected ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request){
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
     @Order(1)
