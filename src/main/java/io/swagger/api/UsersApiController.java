@@ -118,12 +118,12 @@ public class UsersApiController implements UsersApi {
         return new ResponseEntity<String>(userService.login(loginDTO), HttpStatus.OK);
     }
 
-    //@PreAuthorize("hasRole('Employee')")
+    @PreAuthorize("hasRole('Employee')")
     public ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
 )) @PathVariable("userId") Long userId, @Valid @RequestBody UserDTO targetUser) {
 
-        //DIT IS HARDCODED, DIT MOET IK VERANDERN NAAR CONSTANTE OFZO
-        if(!userService.IsLoggedInUserEmployee() || userId==bankAccount) {
+        //Account of bank can not be updated
+        if(userId==bankAccount) {
             return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
         }
 

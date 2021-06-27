@@ -75,8 +75,7 @@ public class TransactionsApiController implements TransactionsApi {
 
         List<Transaction> transactions = new ArrayList<>();
 
-       transactions = transactionService.getTransactionsByFilters(iban, offset, limit, startDateTime, endDateTime);
-
+        transactions = transactionService.getTransactionsByFilters(iban, offset, limit, startDateTime, endDateTime);
 
         if (transactions.size() < 1) {
             return new ResponseEntity<List<Transaction>>(HttpStatus.NOT_FOUND);
