@@ -89,7 +89,7 @@ public interface UsersApi {
         produces = { "application/json" }, 
         method = RequestMethod.GET)
     ResponseEntity<User> getUserById(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId);
+)) @PathVariable("userId") Integer userId) throws NotFoundException;
 
 
     @Operation(summary = "Login a user", description = "", tags={ "Authentication" })

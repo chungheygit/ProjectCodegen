@@ -3,13 +3,12 @@ package io.swagger.controller;
 
 import io.swagger.api.UsersApi;
 import io.swagger.api.UsersApiController;
-import io.swagger.model.Account;
+import io.swagger.model.*;
 import io.swagger.model.DTO.AccountDTO;
 import io.swagger.model.DTO.UpdateAccountDTO;
 
-import io.swagger.model.User;
-import io.swagger.model.UserType;
 import io.swagger.service.AccountService;
+import io.swagger.service.TransactionService;
 import io.swagger.service.UserService;
 import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,6 +36,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
@@ -44,6 +44,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -65,10 +66,10 @@ class UsersApiControllerTest {
     public void init(){
         users =
                 Arrays.asList(
-                        new User("Bruno", "Fernandes", LocalDate.of(2021,1,25), "lio@test.com","password", UserType.ROLE_EMPLOYEE, new BigDecimal("1000.02"), new BigDecimal("250.02"), true),
-                        new User("Frenkie", "De Jong", LocalDate.of(2021,4,20), "lio@test2.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.02"), new BigDecimal("250.02"), true),
-                        new User("Kevin", "De Bruyne", LocalDate.of(2021,6,1), "cus","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.02"), new BigDecimal("250.02"), false),
-                        new User("N'Golo", "Kanté", LocalDate.of(2021,3,18), "emp","password", UserType.ROLE_EMPLOYEE, new BigDecimal("1000.02"), new BigDecimal("250.02"), false)
+                        new User("Bruno", "Fernandes", LocalDate.of(2021,1,25), "lio@test.com","password", UserType.ROLE_Employee, new BigDecimal("1000.02"), new BigDecimal("250.02"), true),
+                        new User("Frenkie", "De Jong", LocalDate.of(2021,4,20), "lio@test2.com","password", UserType.ROLE_Customer, new BigDecimal("1000.02"), new BigDecimal("250.02"), true),
+                        new User("Kevin", "De Bruyne", LocalDate.of(2021,6,1), "cus","password", UserType.ROLE_Customer, new BigDecimal("1000.02"), new BigDecimal("250.02"), false),
+                        new User("N'Golo", "Kanté", LocalDate.of(2021,3,18), "emp","password", UserType.ROLE_Employee, new BigDecimal("1000.02"), new BigDecimal("250.02"), false)
                 );
 
         accounts =
