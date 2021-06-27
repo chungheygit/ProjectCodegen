@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.LocalDate;
@@ -77,21 +78,10 @@ public class AccountService {
         return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
     }
 
-    public boolean getAccountByIbanUserAuthorized(String iban) throws Exception {
-        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-
     public Account createAccount(AccountDTO accountDTO) throws Exception {
 
         ModelMapper modelMapper = new ModelMapper();
         Account account = modelMapper.map(accountDTO, Account.class);
-
-//        validateAccountDTO(accountDTO); // validatie methode in controller
 
         account.setIban(generateIban()); // iban automatisch genereren en vullen
         account.setCreatedDate(java.time.LocalDate.now()); // Datum ter plek genereren
@@ -103,12 +93,7 @@ public class AccountService {
     {
         Account accountToUpdate = getAccountByIban(iban);
 
-        //validateUpdateAccountDTO(updateAccountDTO);// input validatie in controller
-        if (validateAccountBankUpdate(iban)== false)
-        {
-            log.error("bank cannot be updated");
-            throw new IllegalArgumentException("bank cannot be updated");
-        };
+
 
         // de parameters hieronder mogen worden geupdate, andere als Id en Iban blijven vast
         accountToUpdate.setAccountType(updateAccountDTO.getAccountType());
@@ -139,14 +124,39 @@ public class AccountService {
     }
     public void validateAccounttype(AccountType accountType)
     {
-        if (accountType == null)
+        if (accountType == null) // als er wat anders dan current or savings word ingevuld krijgt die een null terug
         {
             log.error("Accounttype has to be 'current' or 'savings' ! ");
             throw new IllegalArgumentException("Accounttype has to be 'current' or 'savings' ! ");
         }
     }
+    public void ValidateUpdateBankAccount(String iban)
+    {
+        if (checkIfIbanEqualsBankIban(iban)== false)
+        {
+            log.error("bank account cannot be updated !");
+            throw new IllegalArgumentException("bank account cannot be updated !");
+        };
+    }
+    public void ValidateBooleanOpen(Boolean open)
+    {
+       if (checkIfOpenIsTrueOrFalse(open) == false )
+       {
+           log.error("Account has to be open or 'true' or 'false' !");
+           throw new IllegalArgumentException("Account has to be open or 'true' or 'false' !");
+       }
+    }
 
-    public boolean validateAccountBankUpdate(String iban)
+    public boolean checkIfOpenIsTrueOrFalse(Boolean open)
+    {
+        if (open.equals(true) || open.equals(false) )
+        {
+            return true;
+
+        }
+        return false;
+    }
+    public boolean checkIfIbanEqualsBankIban(String iban)
     {
         if (iban.equals(BANK_IBAN) )
         {
@@ -155,6 +165,7 @@ public class AccountService {
         }
         return true;
     }
+
 
     // check if user exists
     public boolean userExist(Long userID) {
@@ -231,6 +242,14 @@ public class AccountService {
             return true;
         }
         return false;
+    }
+    public boolean getAccountByIbanUserAuthorized(String iban) throws Exception {
+        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+            return false;
+        }
+        else{
+            return true;
+        }
     }
 }
 

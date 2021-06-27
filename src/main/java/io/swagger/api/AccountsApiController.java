@@ -97,6 +97,8 @@ public class AccountsApiController implements AccountsApi {
         accountService.validateBalance(updateAccountDTO.getBalance());
         accountService.validateAbsoluteLimit(updateAccountDTO.getAbsoluteLimit());
         accountService.validateAccounttype(updateAccountDTO.getAccountType());
+        accountService.ValidateUpdateBankAccount(iban);
+        accountService.ValidateBooleanOpen(updateAccountDTO.getOpen());
 
         return new ResponseEntity<Account>(accountService.updateAccount(iban, updateAccountDTO), HttpStatus.OK);
 
