@@ -1,5 +1,7 @@
 package io.swagger.service;
 
+import io.cucumber.java.bs.A;
+import io.swagger.configuration.MyApplicationRunner;
 import io.swagger.model.Account;
 import io.swagger.model.AccountType;
 import io.swagger.model.DTO.AccountDTO;
@@ -37,15 +39,19 @@ public class AccountService {
     @Autowired
     private MyUserDetailsService myUserDetailsService;
 
-    String bank = "NL01INHO0000000001";
+     private final static String BANK_IBAN = "NL01INHO0000000001";
 
 
     UpdateAccountDTO updateAccountDTO;
+    AccountDTO accountDTO;
+    Account account;
     private static final Logger log = LoggerFactory.getLogger(AccountService.class);
 
     public AccountService() {
 
         updateAccountDTO = new UpdateAccountDTO();
+        accountDTO = new AccountDTO();
+        account = new Account();
 
     }
     public List<Account> getAllAccounts(){
@@ -72,32 +78,17 @@ public class AccountService {
 
          return accountRepository.save(account);
     }
-    // validate input create account
-    public void validateAccountDTO(AccountDTO accountDTO) throws Exception {
-        if (accountDTO.getBalance().compareTo(BigDecimal.ZERO) < 0) {// check of BALANCE niet negatief is
-            log.error("Balance cannot be negative ! ");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative ! ");
-        }
-        if (accountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO) < 0) {// check of ABSOLUTE-LIMIT niet negatief is
-            log.error("Absolute limit cannot be negative ! ");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Absolute limit cannot be negative ! ");
-        }
-        // checkt of user id is in gebruik
-        CheckUserId(accountDTO);
 
-        if (accountDTO.getAccountType() == null)
-        {
-            log.error("Accounttype has to be 'current' or 'saving' ! ");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accounttype has to be 'current' or 'saving' ! ");
-        }
-
-    }
     public Account updateAccount(String iban, UpdateAccountDTO updateAccountDTO) throws Exception
     {
         Account accountToUpdate = getAccountByIban(iban);
 
         //validateUpdateAccountDTO(updateAccountDTO);// input validatie in controller
-
+        if (validateAccountBankUpdate(iban)== false)
+        {
+            log.error("bank cannot be updated");
+            throw new IllegalArgumentException("bank cannot be updated");
+        };
 
         // de parameters hieronder mogen worden geupdate, andere als Id en Iban blijven vast
         accountToUpdate.setAccountType(updateAccountDTO.getAccountType());
@@ -108,49 +99,53 @@ public class AccountService {
 
         return  accountRepository.save(accountToUpdate);
     }
-    // validate input update account
-    public void validateUpdateAccountDTO(UpdateAccountDTO updateAccountDTO) throws Exception {
 
+
+    public void validateBalance(BigDecimal balance)
+    {
         //  check of BALANCE niet negatief is
-        if (updateAccountDTO.getBalance().compareTo(BigDecimal.ZERO)  < 0)
+        if (balance.compareTo(BigDecimal.ZERO)  < 0)
         {
             log.error("Balance cannot be negative ! ");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Balance cannot be negative ! ");
+            throw new IllegalArgumentException("Balance cannot be negative ! ");
         }
-        if (updateAccountDTO.getAbsoluteLimit().compareTo(BigDecimal.ZERO) < 0) { //check of ABSOLUTE-LIMIT niet negatief is
+    }
+    public void validateAbsoluteLimit(BigDecimal absoluteLimit)
+    {
+        if (absoluteLimit.compareTo(BigDecimal.ZERO) < 0) { //check of ABSOLUTE-LIMIT niet negatief is
             log.error("Absolute limit cannot be negative ! ");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Absolute limit cannot be negative ! ");
+            throw new IllegalArgumentException( "Absolute limit cannot be negative ! ");
         }
-        if (updateAccountDTO.getAccountType() == null)
+    }
+    public void validateAccounttype(AccountType accountType)
+    {
+        if (accountType == null)
         {
-            log.error("Accounttype has to be 'current' or 'saving' ! ");
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Accounttype has to be 'current' or 'saving' ! ");
+            log.error("Accounttype has to be 'current' or 'savings' ! ");
+            throw new IllegalArgumentException("Accounttype has to be 'current' or 'savings' ! ");
         }
+    }
+
+    public boolean validateAccountBankUpdate(String iban)
+    {
+        if (iban.equals(BANK_IBAN) )
+        {
+            return false;
+
+        }
+        return true;
     }
     // check if user exists
     public boolean userExist(Long userID) {
-        return (userRepository.findById(userID)!= null);
-    }
-    public void CheckUserId(AccountDTO accountDTO) throws Exception {
-        // check if user if exists
-        Integer HaveToChooseId = Math.toIntExact(userRepository.findAll().size() + 1);
-        Integer FilledID = Math.toIntExact(accountDTO.getUserId());
-        if (userExist(accountDTO.getUserId()) == true && FilledID < HaveToChooseId)
+
+        if (userRepository.findById(userID) == null)
         {
-            log.error("User ID is already in use, please choose "+ HaveToChooseId );
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User ID is already in use, please choose "+ HaveToChooseId);
+            return false;
         }
+        return true;
     }
 
-        public Boolean EnumStartsWith(AccountDTO accountDTO)
-       {
-           String Type = accountDTO.getAccountType().toString();
-           if (Type.startsWith("s"))
-           {
-               accountDTO.setAccountType(AccountType.SAVINGS);
-           }
-           return true;
-       }
+
     // check if accounts exists
     public boolean accountExist(String iban) {
         return (accountRepository.getAccountByIban(iban) != null);
@@ -175,13 +170,6 @@ public class AccountService {
     }
 
 
-//    public User checkIfUserIdIsUsed(User userId) throws Exception {
-//        Integer LastUserId = userService.getAllUsers(100,0).size()-1;
-//        if (userId.id() == LastUserId || userId.id() < LastUserId){
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User Id already in use, choose id " + LastUserId);
-//        }
-//        return userId;
-//    }
 
     public static LocalDate parse(CharSequence text, DateTimeFormatter isoLocalDate) {
         return parse(text, DateTimeFormatter.ISO_LOCAL_DATE);

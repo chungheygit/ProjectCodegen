@@ -22,6 +22,9 @@ public class AccountDTO {
         this.accountType = accountType;
     }
 
+    public AccountDTO() {
+    }
+
     public BigDecimal getBalance() {
         return balance;
     }

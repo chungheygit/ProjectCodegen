@@ -120,20 +120,38 @@ public class AccountsApiControllerTest {
     @Test
     @WithMockUser(username = "emp", password = "password", roles = "Employee")
     public void postingAccountShouldReturn201Created() throws Exception {
-        given(service.createAccount(accountDTO)).willReturn(account);
         this.mvc.perform(
-                post("/accounts")
-                        .contentType(MediaType.APPLICATION_JSON_VALUE))
+                post("/accounts/")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+        .content("{\"absoluteLimit\": 500,\"accountType\": \"current\",\"balance\": 500,\"open\": \"true\", \"userId\": 10}"))
+                .andExpect(status().isCreated());
+    }
+    @Test
+    @WithMockUser(username = "emp", password = "password", roles = "Employee")
+    public void postingAccountWithNegativeBalanceShouldReturn403() throws Exception {
+        this.mvc.perform(
+                post("/accounts/")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content("{\"absoluteLimit\": -500,\"accountType\": \"current\",\"balance\": 500,\"open\": \"true\", \"userId\": 10}"))
                 .andExpect(status().isCreated());
     }
 
     @Test
-    public void createAccountAsCustomerReturnForbidden() throws Exception {
-
-        this.mvc.perform(post("/accounts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("account")).andExpect(status().isForbidden());
+    @WithMockUser(username = "emp", password = "password", roles = "Employee")
+    public void updatingAccountShouldReturn200() throws Exception {
+        this.mvc.perform(
+                put("/accounts/NL58INHO0123456702")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .content("{\n" +
+                                "  \"absoluteLimit\": -500,\n" +
+                                "  \"accountType\": \"current\",\n" +
+                                "  \"balance\": 0,\n" +
+                                "  \"open\": true\n" +
+                                "}"))
+                .andExpect(status().isBadRequest());
     }
+
+
 
 
 

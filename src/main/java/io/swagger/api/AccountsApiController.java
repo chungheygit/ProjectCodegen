@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -44,7 +45,7 @@ public class AccountsApiController implements AccountsApi {
 
     private final UserService userService;
 
-    public static final String Bank_IBAN = "NL01INHO0000000001";
+     String bank = "NL01INHO0000000001";
 
     @org.springframework.beans.factory.annotation.Autowired
     public AccountsApiController(ObjectMapper objectMapper, HttpServletRequest request, AccountService accountService, UserService userService) {
@@ -56,7 +57,11 @@ public class AccountsApiController implements AccountsApi {
 
     @PreAuthorize("hasRole('Employee')") // access for employee only
     public ResponseEntity<Account> createAccount(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody AccountDTO accountDTO) throws Exception {
-        accountService.validateAccountDTO(accountDTO);
+
+        accountService.validateBalance(accountDTO.getBalance());
+        accountService.validateAbsoluteLimit(accountDTO.getAbsoluteLimit());
+        accountService.validateAccounttype(accountDTO.getAccountType());
+
         return new ResponseEntity<Account>(accountService.createAccount(accountDTO), HttpStatus.CREATED);
 
     }
@@ -71,18 +76,17 @@ public class AccountsApiController implements AccountsApi {
     public ResponseEntity<List<Account>> getAllAccounts(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
 )) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter accounts by creation date" ,schema=@Schema()) @Valid @RequestParam(value = "createdDate", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate createdDate) {
-        try {
+
             return new ResponseEntity<List<Account>>((List<Account>) accountService.getAccountsByCreatedDate(createdDate, offset, limit), HttpStatus.OK);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
-
     }
 
     @PreAuthorize("hasRole('Employee')") // access for employee only
     public ResponseEntity<Account> updateAccount(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.PATH, description = "The IBAN number as string", required=true, schema=@Schema()) @PathVariable("iban") String iban,@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody UpdateAccountDTO updateAccountDTO) throws Exception {
-        accountService.validateUpdateAccountDTO(updateAccountDTO);
+
+        accountService.validateBalance(updateAccountDTO.getBalance());
+        accountService.validateAbsoluteLimit(updateAccountDTO.getAbsoluteLimit());
+        accountService.validateAccounttype(updateAccountDTO.getAccountType());
+
         return new ResponseEntity<Account>(accountService.updateAccount(iban, updateAccountDTO), HttpStatus.OK);
 
     }

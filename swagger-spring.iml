@@ -41,6 +41,22 @@
     <orderEntry type="library" name="Maven: org.apiguardian:apiguardian-api:1.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.opentest4j:opentest4j:1.2.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.junit.platform:junit-platform-commons:1.7.1" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:cucumber-java:6.10.4" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:cucumber-core:6.10.4" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:cucumber-gherkin:6.10.4" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:cucumber-gherkin-messages:6.10.4" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:messages:15.0.0" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:tag-expressions:3.0.1" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:cucumber-expressions:10.3.0" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:datatable:3.5.0" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:cucumber-plugin:6.10.4" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:docstring:6.10.4" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:html-formatter:13.0.0" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:create-meta:4.0.0" level="project" />
+    <orderEntry type="library" name="Maven: io.cucumber:cucumber-junit:6.10.4" level="project" />
+    <orderEntry type="library" name="Maven: junit:junit:4.13.2" level="project" />
+    <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:2.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter-web:2.4.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-starter:2.4.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:2.4.4" level="project" />
@@ -151,20 +167,5 @@
     <orderEntry type="library" scope="TEST" name="Maven: org.xmlunit:xmlunit-core:2.7.0" level="project" />
     <orderEntry type="library" name="Maven: io.swagger.core.v3:swagger-annotations:2.1.2" level="project" />
     <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.18" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-java:6.10.4" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-core:6.10.4" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-gherkin:6.10.4" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-gherkin-messages:6.10.4" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:messages:15.0.0" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:tag-expressions:3.0.1" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-expressions:10.3.0" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:datatable:3.5.0" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-plugin:6.10.4" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:docstring:6.10.4" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:html-formatter:13.0.0" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:create-meta:4.0.0" level="project" />
-    <orderEntry type="library" name="Maven: io.cucumber:cucumber-junit:6.10.4" level="project" />
-    <orderEntry type="library" name="Maven: junit:junit:4.13.2" level="project" />
-    <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:2.2" level="project" />
   </component>
 </module>
