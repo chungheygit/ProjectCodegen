@@ -33,7 +33,7 @@ import static java.util.stream.Collectors.joining;
 public class UsersApiController implements UsersApi {
 
     private static final Logger log = LoggerFactory.getLogger(UsersApiController.class);
-
+    private final long bankAccount =0;
     private final ObjectMapper objectMapper;
 
     private final HttpServletRequest request;
@@ -42,7 +42,7 @@ public class UsersApiController implements UsersApi {
 
     private final AccountService accountService;
 
-    //private final Account bankAccount;
+
 
     @org.springframework.beans.factory.annotation.Autowired
     public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request, UserService userService, AccountService accountService) {
@@ -50,7 +50,6 @@ public class UsersApiController implements UsersApi {
         this.request = request;
         this.userService = userService;
         this.accountService = accountService;
-        //this.bankAccount = accountService.GetAllAccounts().stream().filter(b -> b.getIban()=="NL01INHO0000000001").findAny().get();
     }
 
     // CREATE A NEW USER
@@ -119,19 +118,13 @@ public class UsersApiController implements UsersApi {
     public ResponseEntity<User> updateUser(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
 )) @PathVariable("userId") Long userId, @Valid @RequestBody UserDTO targetUser) {
 
-        // check if userId is a long and not negative
-        // Mag niet UserId van ons bank zijn
-        // target user ophalen
-        //targetuser updaten maar valideer eerst alle dingen
-
-
         //DIT IS HARDCODED, DIT MOET IK VERANDERN NAAR CONSTANTE OFZO
-        if(!userService.IsLoggedInUserEmployee() || userId==0) {
+        if(!userService.IsLoggedInUserEmployee() || userId==bankAccount) {
             return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
         }
 
-        //input must be a Long and a positive number
-        if (userId != (long)userId || userId < 0){
+        //input a positive number
+        if (userId < 0){
             return new ResponseEntity<User>(HttpStatus.BAD_REQUEST);
         }
 
@@ -140,12 +133,6 @@ public class UsersApiController implements UsersApi {
             return new ResponseEntity<User>(HttpStatus.NOT_FOUND);
         }
 
-        //try to update user
-//        try{
-            return new ResponseEntity<User>(userService.updateUser(userId,targetUser), HttpStatus.OK);
-//        }
-//        catch (Exception e){
-//            return new ResponseEntity<User>(HttpStatus.NOT_IMPLEMENTED);
-//        }
+        return new ResponseEntity<User>(userService.updateUser(userId,targetUser), HttpStatus.OK);
     }
 }

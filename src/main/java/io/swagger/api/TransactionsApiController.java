@@ -59,14 +59,6 @@ public class TransactionsApiController implements TransactionsApi {
     public ResponseEntity<List<Transaction>> getAllTransactions(@Pattern(regexp="^NL\\d{2}INHO0\\d{9}$") @Parameter(in = ParameterIn.QUERY, description = "The IBAN number as string", schema=@Schema()) @Valid @RequestParam(value = "iban", required = false) String iban, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
     )) @Valid @RequestParam(value = "offset", required = false) Integer offset, @Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
     )) @Valid @RequestParam(value = "limit", required = false) Integer limit, @Parameter(in = ParameterIn.QUERY, description = "filter transactions from this date. Format: dd/MM/yyyy HH:mm:ss" ,schema=@Schema()) @Valid @RequestParam(value = "startDateTime", required = false) String startDateTime, @Parameter(in = ParameterIn.QUERY, description = "filter transactions to this date. Format: dd/MM/yyyy HH:mm:ss" ,schema=@Schema()) @Valid @RequestParam(value = "endDateTime", required = false) String endDateTime) throws Exception {
-        //Input Iban/starttijd/eindtijd/limit/offset
-
-        // if starttijd is eerder dan eindtijd forbidden. ///if strijd is niet gelijk aan timeformat
-
-        //Input MOET INTEGER ZIJN anders BAD REQUEST It must be a non-negative number
-        //DIT IS ZOWEL EMPLOYEE ALS CUSTOMER ENDPOINT
-        //CUSTOMER KAN ALLEEN EIGEN TRANSACTIE ZIEN. ANDERE TRANSACTIES UNAUTORIZED
-        //ALS NIKS GEVONDEN NOTFOUND
 
         //if logged in user is customer and iban is not from customer
         if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
@@ -86,13 +78,8 @@ public class TransactionsApiController implements TransactionsApi {
     }
     public ResponseEntity<Transaction> getTransactionById(@Parameter(in = ParameterIn.PATH, description = "The transaction ID", required=true, schema=@Schema()) @PathVariable("transactionId") Integer transactionId) {
 
-        //INPUT MOET INTEGER ZIJN anders BAD REQUEST It must be a non-negative number
-        //DIT IS ZOWEL EMPLOYEE ALS CUSTOMER ENDPOINT
-        //CUSTOMER KAN ALLEEN EIGEN TRANSACTIE ZIEN. ANDERE TRANSACTIES UNAUTORIZED
-        //ALS NIKS GEVONDEN NOTFOUND
-
-        //input must be a integer and a positive number
-        if (transactionId != (int)transactionId || transactionId < 0){
+        //input must be a positive number
+        if (transactionId < 0){
             return new ResponseEntity<Transaction>(HttpStatus.BAD_REQUEST);
         }
 
@@ -100,7 +87,6 @@ public class TransactionsApiController implements TransactionsApi {
         if(!userService.IsLoggedInUserEmployee() && !transactionService.isTransactionFromLoggedInUser(transactionId)){//methode that checks if transaction is from user
             return new ResponseEntity<Transaction>(HttpStatus.UNAUTHORIZED);
         }
-
 
         return new ResponseEntity<Transaction>(transactionService.getTransactionById(transactionId),HttpStatus.OK);
 
