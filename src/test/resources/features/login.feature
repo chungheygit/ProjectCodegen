@@ -8,8 +8,10 @@ Feature: Login test
   Scenario: Logging in with wrong password returns status 404
     When I log in with email "mark@inholland.nl" and password "pawdard"
     Then I get status 404
+    And  I get message containing "email/password invalid" in LoginSteps
 
   Scenario: Logging in with wrong email returns status 404
     When I log in with email "idontexist@gmail.com" and password "password"
     Then I get status 404
+    And  I get message containing "email/password invalid" in LoginSteps
 

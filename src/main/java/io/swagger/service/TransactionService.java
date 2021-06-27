@@ -137,7 +137,7 @@ public class TransactionService {
     private void checkIfAccountsAreOpen(Account sender, Account receiver){
         if(!sender.isOpen() || !receiver.isOpen()){
             log.error("User tried sending money to a closed account");
-            throw new EntityNotFoundException("Can't transfer to/from closed accounts");
+            throw new IllegalArgumentException("Can't transfer to/from closed accounts");
         }
     }
 

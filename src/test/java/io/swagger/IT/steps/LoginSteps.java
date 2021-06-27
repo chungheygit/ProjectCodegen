@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -33,7 +34,7 @@ public class LoginSteps {
         try{
             responseEntity = template.postForEntity(uri, entity, String.class);
         }
-        catch (HttpClientErrorException ex){
+        catch (HttpStatusCodeException ex){
             responseEntity = new ResponseEntity<String>(ex.getMessage(), ex.getStatusCode());
         }
 
@@ -62,5 +63,17 @@ public class LoginSteps {
     @And("The response is {string}")
     public void theResponseIs(String message) {
         Assert.assertEquals(message, responseEntity.getBody());
+    }
+
+    @And("I get message containing {string} in LoginSteps")
+    public void iGetMessageContainingInLoginSteps(String message) {
+        boolean containsMessage;
+        if(responseEntity.getBody().contains(message)){
+            containsMessage = true;
+        }
+        else{
+            containsMessage = false;
+        }
+        Assert.assertEquals(containsMessage, true);
     }
 }

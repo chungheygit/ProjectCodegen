@@ -16,16 +16,18 @@ import javax.persistence.EntityNotFoundException;
 @ControllerAdvice
 public class MyResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @Order(2)
+    @Order(3)
     @ExceptionHandler(value = {Exception.class})
     protected ResponseEntity<Object> handleGenericException(Exception ex, WebRequest request){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        ExceptionDTO exceptionDTO = new ExceptionDTO(ex.getMessage());
+        return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
     @Order(2)
     @ExceptionHandler(value = {EntityNotFoundException.class})
     protected ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request){
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        ExceptionDTO exceptionDTO = new ExceptionDTO(ex.getMessage());
+        return handleExceptionInternal(ex, exceptionDTO, new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
     @Order(1)

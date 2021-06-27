@@ -73,6 +73,12 @@ public class MyApplicationRunner implements ApplicationRunner {
                         new Transaction(users.get(3).getId(), LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456702", "NL58INHO0123456701", new BigDecimal(500), "loan")
                 );
         transactions.forEach(transactionRepository::save);
-    }
 
+        User user1 = new User("User", "Saving", LocalDate.of(1999,9,19), "user1@gmail.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.00"), new BigDecimal("250.00"), true);
+        userService.createUser(user1);
+        Account user1Saving = new Account(user1.getId(), "NL58INHO0000000089", new BigDecimal(50.25 ), java.time.LocalDate.of(2021,1,25), AccountType.SAVINGS, new BigDecimal(500 ), true);
+        Account user1Current = new Account(user1.getId(), "NL58INHO0000000090", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,1,25), AccountType.CURRENT, new BigDecimal(500 ), true);
+        accountRepository.save(user1Saving);
+        accountRepository.save(user1Current);
+    }
 }
