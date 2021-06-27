@@ -94,14 +94,7 @@ public class AccountsApiControllerTest {
 
     @Test
     @WithMockUser(username = "emp", password = "password", roles = "Employee")
-    public void getAccountsByIBANShouldReturnOK() throws Exception {
-        given(service.getAccountByIban("NL58INHO0123456702")).willReturn(account.iban("NL58INHO0123456702"));
-        this.mvc.perform(get("/accounts/")).andExpect(
-                status().isOk());
-    }
-    @Test
-    @WithMockUser(username = "emp", password = "password", roles = "Employee")
-    public void getAccountsByIBANShouldReturnError() throws Exception {
+    public void getAccountsByIBANShouldReturnOk() throws Exception {
         given(service.getAccountByIban("NL58INHO0123456701")).willReturn(accounts.get(1));
         this.mvc.perform(get("/accounts/")).andExpect(
                 status().isOk());
