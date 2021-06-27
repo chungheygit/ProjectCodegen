@@ -49,12 +49,22 @@ public class TransactionService {
         return optional.orElseThrow(IllegalArgumentException::new);
     }
 
+    public void validateTransactionDTO(TransactionDTO transactionDTO){
+        if(!accountService.validIban(transactionDTO.getSender())){
+            throw new IllegalArgumentException("Please enter a valid iban");
+        }
+        if(!accountService.validIban(transactionDTO.getReceiver())){
+            throw new IllegalArgumentException("Please enter a valid iban");
+        }
+        checkIfAmountIsLegit(transactionDTO.getAmount().doubleValue());
+    }
+
     public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception{
 
         ModelMapper modelMapper = new ModelMapper();
         Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
 
-        checkIfAmountIsLegit(transaction.getAmount().doubleValue());
+        //checkIfAmountIsLegit(transaction.getAmount().doubleValue());
 
         Account senderAccount = accountService.getAccountByIban(transaction.getSender());
         User senderUser = userRepository.getOne(senderAccount.getUserId());
@@ -67,10 +77,7 @@ public class TransactionService {
 
         transaction.setTransactionType(checkTransactionType(senderAccount, receiverAccount));
 
-        //don't check limits for deposits/withdrawals
-        if(transaction.getTransactionType()==TransactionType.TRANSACTION){
-            checkLimits(transaction, senderAccount, senderUser);
-        }
+        checkLimits(transaction, senderAccount, senderUser);
 
         //filling rest of properties
         transaction.setTimestamp(LocalDateTime.now());
@@ -142,20 +149,23 @@ public class TransactionService {
     }
 
     private void checkLimits(Transaction transaction, Account senderAccount, User senderUser){
-        //transactionlimit
-        if(transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()){
-            log.error("User exceed transaction limit");
-            throw new IllegalArgumentException("Amount exceeded transaction limit");
-        }
+        //dont check transactionlimit+daylimit on withdrawals and deposits
+        if(transaction.getTransactionType()==TransactionType.TRANSACTION){
+            //transactionlimit
+            if(transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()){
+                log.error("User exceed transaction limit");
+                throw new IllegalArgumentException("Amount exceeded transaction limit");
+            }
 
-        //daylimit
-        Double spentMoneyToday = transactionRepository.getSpentTransactionMoneyByDate(senderAccount.getIban(), LocalDate.now());
-        if(spentMoneyToday==null){
-            spentMoneyToday = 0.00;
-        }
-        if(spentMoneyToday > senderUser.getDayLimit().doubleValue()){
-            log.error("User exceeded day limit");
-            throw new IllegalArgumentException("Amount exceeded day limit");
+            //daylimit
+            Double spentMoneyToday = transactionRepository.getSpentTransactionMoneyByDate(senderAccount.getIban(), LocalDate.now());
+            if(spentMoneyToday==null){
+                spentMoneyToday = 0.00;
+            }
+            if(spentMoneyToday > senderUser.getDayLimit().doubleValue()){
+                log.error("User exceeded day limit");
+                throw new IllegalArgumentException("Amount exceeded day limit");
+            }
         }
 
         //balance limit

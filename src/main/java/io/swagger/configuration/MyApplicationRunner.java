@@ -76,8 +76,8 @@ public class MyApplicationRunner implements ApplicationRunner {
 
         User user1 = new User("User", "Saving", LocalDate.of(1999,9,19), "user1@gmail.com","password", UserType.ROLE_CUSTOMER, new BigDecimal("1000.00"), new BigDecimal("250.00"), true);
         userService.createUser(user1);
-        Account user1Saving = new Account(user1.getId(), "NL58INHO0000000089", new BigDecimal(50.25 ), java.time.LocalDate.of(2021,1,25), AccountType.SAVINGS, new BigDecimal(500 ), true);
-        Account user1Current = new Account(user1.getId(), "NL58INHO0000000090", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,1,25), AccountType.CURRENT, new BigDecimal(500 ), true);
+        Account user1Saving = new Account(user1.getId(), "NL58INHO0000000089", new BigDecimal(50.25 ), java.time.LocalDate.of(2021,1,25), AccountType.SAVINGS, new BigDecimal(1 ), true);
+        Account user1Current = new Account(user1.getId(), "NL58INHO0000000090", new BigDecimal(9999.25 ), java.time.LocalDate.of(2021,1,25), AccountType.CURRENT, new BigDecimal(1 ), true);
         accountRepository.save(user1Saving);
         accountRepository.save(user1Current);
     }

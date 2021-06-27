@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class AccountService {
@@ -125,6 +127,15 @@ public class AccountService {
     protected void subtractFromBalance(Account account, BigDecimal amount){
         account.setBalance(account.getBalance().subtract(amount));
         accountRepository.save(account);
+    }
+
+    public boolean validIban(String iban) {
+        Pattern pattern = Pattern.compile("NL\\d{2}INHO(\\d{10}|\\d{9})");
+        Matcher matcher = pattern.matcher(iban);
+        if(matcher.matches()){
+            return true;
+        }
+        return false;
     }
 }
 

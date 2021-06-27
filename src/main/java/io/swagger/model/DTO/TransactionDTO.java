@@ -43,4 +43,5 @@ public class TransactionDTO {
     public void setDescription(String description) {
         this.description = description;
     }
+
 }
