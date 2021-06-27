@@ -17,9 +17,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.threeten.bp.OffsetDateTime;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,21 +50,21 @@ public class TransactionService {
 
     public TransactionService() {
     }
+
     public List<Transaction> getAllTransactions() {
         return transactionRepository.findAll();
     }
 
-    public Transaction getTransactionById (Integer transactionId) throws IllegalArgumentException{
-        Optional<Transaction> optional = transactionRepository.findById(transactionId);
-        return optional.orElseThrow(IllegalArgumentException::new);
+    public Transaction getTransactionById(Integer transactionId) {
+        return transactionRepository
+                .findById(transactionId)
+                .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
     }
 
-    public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception{
+    public Transaction createTransaction(TransactionDTO transactionDTO) throws Exception {
 
         ModelMapper modelMapper = new ModelMapper();
         Transaction transaction = modelMapper.map(transactionDTO, Transaction.class);
-
-        checkIfAmountIsLegit(transaction.getAmount().doubleValue());
 
         Account senderAccount = accountService.getAccountByIban(transaction.getSender());
         User senderUser = userRepository.getOne(senderAccount.getUserId());
@@ -79,121 +86,184 @@ public class TransactionService {
         accountService.addToBalance(receiverAccount, transaction.getAmount());
         accountService.subtractFromBalance(senderAccount, transaction.getAmount());
 
+        System.out.println("Sender: " + senderAccount.getBalance() + " receiver: " + receiverAccount.getBalance());
+
         log.info("Transaction successfully created");
         return transactionRepository.save(transaction);
     }
 
-    private void checkIfAmountIsLegit(double amount){
-        if(amount < 0.01){
-            log.error("User entered illegal amount value");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid amount");
-        }
-    }
-
-    private TransactionType checkTransactionType(Account sender, Account receiver){
-        if(sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS)
-        {
-            if(!sender.getUserId().equals(receiver.getUserId())){
+    private TransactionType checkTransactionType(Account sender, Account receiver) {
+        if (sender.getAccountType() == AccountType.SAVINGS || receiver.getAccountType() == AccountType.SAVINGS) {
+            if (!sender.getUserId().equals(receiver.getUserId())) {
                 log.error("User tried transfering to/from savings account from other user");
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Forbidden to transfer from/to savings account from another user.");
-            }
-            else{
-                if(sender.getAccountType() == AccountType.SAVINGS){
+            } else {
+                if (sender.getAccountType() == AccountType.SAVINGS) {
                     return TransactionType.WITHDRAWAL;
-                }
-                else{
+                } else {
                     return TransactionType.DEPOSIT;
                 }
             }
-        }
-        else{
+        } else {
             return TransactionType.TRANSACTION;
         }
     }
 
-    private void checkIfUserPerformingIsPermitted(User userPerforming, User senderUser){
+    private void checkIfUserPerformingIsPermitted(User userPerforming, User senderUser) {
         //check if user is employee
-        if(!userService.IsLoggedInUserEmployee()){
+        if (!userService.IsLoggedInUserEmployee()) {
             //check if user is sender
-            if(!userPerforming.getId().equals(senderUser.getId())){
+            if (!userPerforming.getId().equals(senderUser.getId())) {
                 log.error("User not employee, and not the owner of sending account");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the sender");
             }
         }
     }
 
-    private void checkIfAccountsAreTheSame(Account sender, Account receiver){
-        if(sender == receiver){
+    private void checkIfAccountsAreTheSame(Account sender, Account receiver) {
+        if (sender == receiver) {
             log.error("User tried sending money to same account");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't send money to same account");
         }
     }
 
-    private void checkIfAccountsAreOpen(Account sender, Account receiver){
-        if(!sender.isOpen() || !receiver.isOpen()){
+    private void checkIfAccountsAreOpen(Account sender, Account receiver) {
+        if (!sender.isOpen() || !receiver.isOpen()) {
             log.error("User tried sending money to a closed account");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Can't transfer to/from closed accounts");
         }
     }
 
-    private void checkLimits(Transaction transaction, Account senderAccount, User senderUser){
+    private void checkLimits(Transaction transaction, Account senderAccount, User senderUser) {
         //transactionlimit
-        if(transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()){
+        if (transaction.getAmount().doubleValue() > senderUser.getTransactionLimit().doubleValue()) {
             log.error("User exceed transaction limit");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded transaction limit");
         }
 
         //daylimit
         Double spentMoneyToday = transactionRepository.getSpentMoneyByDate(senderAccount.getIban(), LocalDate.now());
-        if(spentMoneyToday==null){
+        if (spentMoneyToday == null) {
             spentMoneyToday = 0.00;
         }
-        if(spentMoneyToday > senderUser.getDayLimit().doubleValue()){
+        if (spentMoneyToday > senderUser.getDayLimit().doubleValue()) {
             log.error("User exceeded day limit");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Amount exceeded day limit");
         }
 
         //balance limit
-        if(senderAccount.getBalance().doubleValue() - transaction.getAmount().doubleValue() < senderAccount.getAbsoluteLimit().doubleValue()){
+        if (senderAccount.getBalance().doubleValue() - transaction.getAmount().doubleValue() < senderAccount.getAbsoluteLimit().doubleValue()) {
             log.error("Account balance too low");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Balance too low");
         }
     }
 
-    public List<Transaction> getTransactionsByFilters(String iban, Integer offset, Integer limit, String startDate, String endDate){
+    public Boolean validateTransactionId(String transactionId) {
+        //mag niet negatief en moet integer zijn
 
-        //default values
-        //parsedStartDate is equal to the opening of our bank
-        LocalDate parsedStartDate=LocalDate.of(1998,11,23);;
-        LocalDate parsedEndDate=LocalDate.now();
-
-        //if a filter is used. check further..
-        if(iban!=null || offset!=null || limit!=null || startDate!=null || endDate!=null) {
-            if (startDate != null || endDate != null) {
-                if (startDate != null) {
-                    parsedStartDate = LocalDate.parse(startDate);
-                }
-                if (endDate != null) {
-                    parsedEndDate = LocalDate.parse(endDate);
-                }
-                if(iban==null) {
-                    return transactionRepository.getTransactionsByDay(parsedStartDate,parsedEndDate,limit,offset);
-                }
-            } else if (iban != null) {
-                //account ophalen
-                Account account = accountRepository.getAccountByIban(iban);
-
-                if (startDate == null) {
-                    parsedStartDate = account.getCreatedDate();
-                }
-                return transactionRepository.getTransactionsByIban(iban, limit, offset);
-            }
-
-            return transactionRepository.getTransactionsByFilters(iban, parsedStartDate, parsedEndDate, limit, offset );
+        try {
+            Integer intValue = Integer.parseInt(transactionId);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
-        else{
-            return getAllTransactions();
+    }
+
+    public Boolean isTransactionFromLoggedInUser(Integer transactionid) {
+        //getting the transaction
+        Transaction transaction = getTransactionById(transactionid);
+
+        //getting the loggedIn user
+        User loggedInUser = userService.findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
+
+        //getting the accounts of loggedIn user
+        List<Account> accountsOfLoggedInUser = accountService.getAccountsByUserId(loggedInUser.getId());
+
+        // checks if sender is equal to loggedinuser
+
+        for (Account a : accountsOfLoggedInUser) {
+
+            for (int i = 0; i < accountsOfLoggedInUser.size(); i++) {
+
+                //checks first if account is of loggedIn user
+                if (a.getUserId().equals(loggedInUser.getId())) {
+                    //checks if iban of account is equal to iban of receiver or sender
+                    if (a.getIban().equals(transaction.getReceiver()) || a.getIban().equals(transaction.getSender())) {
+                        return true;
+                    }
+
+                }
+            }
+        }
+        return false;
+    }
+    private void checkIfTimestampIsValid(String timestamp) throws Exception {
+
+        Timestamp parsedTimeStamp= convertToTimestamp(timestamp);
+
+        //if Timestamp is greater than now
+        if(parsedTimeStamp.compareTo(Timestamp.valueOf(LocalDateTime.now()))>0){
+            log.error("DateTime can not be greater than now!");
+            throw new IllegalArgumentException("DateTime can not be greater than now. Try Again!");
         }
 
     }
+    private void checkIfStartDateIsGreaterThanEndDate(String startDateTime, String endDateTime) throws Exception {
+
+        Timestamp parsedStartDateTime= convertToTimestamp(startDateTime);
+        Timestamp parsedEndDateTime= convertToTimestamp(endDateTime);
+
+        //if StartDateTime is greater than EndDateTime
+        if(parsedStartDateTime.compareTo(parsedEndDateTime)>0){
+            log.error("StartDateTime can not be greater than endDateTime!");
+            throw new IllegalArgumentException("StartDateTime can not be greater than endDateTime. Try Again!");
+        }
+    }
+    private void validateStartDateTimeAndEndDateTime(String startDateTime, String endDateTime) throws Exception {
+        if (startDateTime != null && endDateTime != null) {
+            checkIfStartDateIsGreaterThanEndDate(startDateTime, endDateTime);
+        } else if (startDateTime != null) {
+            checkIfTimestampIsValid(startDateTime);
+
+        } else if (endDateTime != null) {
+            checkIfTimestampIsValid(endDateTime);
+        }
+    }
+
+    public List<Transaction> getTransactionsByFilters(String iban, Integer offset, Integer limit, String startDateTime, String endDateTime) throws Exception {
+
+        //validate startDateTime en EndDateTime
+        validateStartDateTimeAndEndDateTime(startDateTime,endDateTime);
+
+        if (iban == null && offset == null && limit == null && startDateTime == null && endDateTime == null) {
+            return getAllTransactions();
+        } else if (iban != null && startDateTime == null && endDateTime == null) {
+            return transactionRepository.getAllTransactionsByIban(iban, limit, offset);
+        } else if (iban == null && startDateTime != null && endDateTime == null) {
+            return transactionRepository.getAllTransactionsByStartDate(convertToTimestamp(startDateTime), limit, offset);
+        } else if (iban == null && startDateTime == null && endDateTime != null) {
+            return transactionRepository.getAllTransactionsByEndDate(convertToTimestamp(endDateTime), limit, offset);
+        } else if (iban != null && startDateTime != null && endDateTime == null) {
+            return transactionRepository.getAllTransactionsByIbanAndStartDate(iban,convertToTimestamp(startDateTime), limit, offset);
+        } else if (iban != null && startDateTime == null && endDateTime != null) {
+            return transactionRepository.getAllTransactionsByIbanAndEndDate(iban,convertToTimestamp(endDateTime), limit, offset);
+        } else if (iban == null && startDateTime != null && endDateTime != null) {
+            return transactionRepository.getAllTransactionsByStartDateAndEndDate(convertToTimestamp(startDateTime), convertToTimestamp(endDateTime), limit, offset);
+        } else if (iban == null && startDateTime == null && endDateTime == null || limit != null || offset != null) {
+            return transactionRepository.getAllTransactionsByLimitAndOffset(limit, offset);
+        }
+        return transactionRepository.getAllTransactionsByFilters(iban, convertToTimestamp(startDateTime), convertToTimestamp(endDateTime), limit, offset);
+    }
+
+    public Timestamp convertToTimestamp(String date) throws Exception {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+
+        try {
+            return new Timestamp(dateFormat.parse(date).getTime());
+
+        } catch (ParseException parseException) {
+            throw new IllegalArgumentException ("Date has an invalid format. Message:" + parseException);
+        }
+    }
 }
+

@@ -3,6 +3,7 @@ package io.swagger.service;
 import io.swagger.model.Account;
 import io.swagger.model.AccountType;
 import io.swagger.model.DTO.AccountDTO;
+import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.repository.AccountRepository;
 import io.swagger.repository.UserRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.GeneratedValue;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -39,6 +41,12 @@ public class AccountService {
 
         usedIBANs = new ArrayList<>();
 
+    }
+    public List<Account> getAccountsByUserId (Long userId) {
+        return accountRepository.getAccountByUserId(userId);
+    }
+    public Account getAccountByUserId (Long userId) {
+        return GetAllAccounts().stream().filter(b -> b.getIban()=="NL01INHO0000000001").findAny().get();
     }
     public List<Account> GetAllAccounts(){
         return accountRepository.findAll();
@@ -94,6 +102,9 @@ public class AccountService {
         // filling properties
         account.setIban(generateIban());
         account.setCreatedDate(java.time.LocalDate.now());
+        account.setAbsoluteLimit(new BigDecimal(500));
+        account.setAccountType(AccountType.CURRENT);
+        account.setOpen(true);
 
 
          return accountRepository.save(account);

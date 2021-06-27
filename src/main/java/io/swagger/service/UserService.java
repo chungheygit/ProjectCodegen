@@ -1,12 +1,14 @@
 package io.swagger.service;
 
 import io.swagger.model.DTO.LoginDTO;
+import io.swagger.model.DTO.UserDTO;
 import io.swagger.model.Transaction;
 import io.swagger.model.User;
 import io.swagger.model.UserType;
 import io.swagger.repository.UserRepository;
 import io.swagger.security.JwtTokenProvider;
 import io.swagger.security.MyUserDetailsService;
+import org.apache.tomcat.jni.Local;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.persistence.EntityNotFoundException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,7 +65,7 @@ public class UserService {
     public User getUserById (long id){
         return userRepository
             .findById(id)
-            .orElseThrow(() ->  new IllegalArgumentException());
+                .orElseThrow(() ->  new EntityNotFoundException("User not found"));
     }
 
     // Get all users by mail
@@ -75,7 +81,89 @@ public class UserService {
         }
     }
 
-    public User updateUser(User targetUser) { return userRepository.save(targetUser); }
+    public User updateUser(long targetUserId, UserDTO targetUser) {
+        //validate user input
+        validateUserInput(targetUser);
+
+        //get user
+        User userToUpdate = getUserById(targetUserId);
+
+        userToUpdate.setFirstName(targetUser.getFirstName());
+        userToUpdate.setLastName(targetUser.getLastName());
+        userToUpdate.setDayLimit(targetUser.getDayLimit());
+        userToUpdate.setPassword(targetUser.getPassword());
+        userToUpdate.setDateOfBirth(targetUser.getDateOfBirth());
+        userToUpdate.setEmail(targetUser.getEmail());
+        userToUpdate.setOpen(targetUser.getOpen());
+        userToUpdate.setTransactionLimit(targetUser.getTransactionLimit());
+        userToUpdate.setUserType(targetUser.getUserTypeEnum());
+        return userRepository.save(userToUpdate);
+    }
+
+    private void validateUserInput(UserDTO targetUser){
+
+        //checks if it is a string
+        if(!targetUser.getFirstName().matches("[a-zA-Z_]+") || !targetUser.getLastName().matches("[a-zA-Z_]+")) {
+            log.error("Invalid input given, String required!");
+            throw new IllegalArgumentException ("Invalid input given, String required.");
+        }
+
+        //checks email with regex
+        if(!targetUser.getEmail().matches("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")) {
+            log.error("Invalid email given, check email again!");
+            throw new IllegalArgumentException ("Invalid email given, check email again!.");
+        }
+
+        //DateOfBirth must be a date in the past
+        if(!targetUser.getDateOfBirth().isBefore(LocalDate.now()) /*|| targetUser.getDateOfBirth()==*/){
+            log.error("Invalid DateOfBirth given, Date must be in the past!");
+            throw new IllegalArgumentException("Invalid DateOfBirth given, Date must be in the past!.");
+        }
+
+        //checks enum
+        //if(targetUser.getUserTypeEnum().fromValue(UserType))
+
+        //transactionlimit and daylimit can not be negative
+        if(targetUser.getTransactionLimit().compareTo(BigDecimal.ZERO) < 0 || targetUser.getDayLimit().compareTo(BigDecimal.ZERO) < 0){
+            log.error("Invalid limit given, Transactionlimit or daylimit can not be negative!");
+            throw new IllegalArgumentException("Invalid limit given, Transactionlimit or daylimit can not be negative!");
+        }
+
+        //check password
+        validatePassword(targetUser.getPassword());
+    }
+    private void validatePassword(String password) {
+
+        // Check if password length is 7 or more
+        if (password.length() < 7) {
+            log.error("Invalid password given, password length must be 7 or more!");
+            throw new IllegalArgumentException("Invalid password given, password length must be 7 or more!");
+        }
+
+        // Check if password has a letter
+        if (!(password.matches("(.*)([a-z])(.*)"))) {
+            log.error("Invalid password given, password misses a letter!");
+            throw new IllegalArgumentException("Invalid password given, password misses a letter!");
+        }
+
+        // Check if password has a capital letter
+        if (!(password.matches("(.*)([A-Z])(.*)"))) {
+            log.error("Invalid password given, password misses a capital letter!");
+            throw new IllegalArgumentException("Invalid password given, password misses a capital letter!");
+        }
+
+        // Check if password has a number
+        if (!(password.matches("(.*)([0-9])(.*)"))) {
+            log.error("Invalid password given, password misses a number!");
+            throw new IllegalArgumentException("Invalid password given, password misses a number!");
+        }
+
+        // Check if password has one of these special characters (!, @, #, $, %, ^, & or *)
+        if (!(password.matches("(.*)([\\!\\@\\#\\$\\%\\^\\&\\*])(.*)"))) {
+            log.error("Invalid password given, password misses one of these special characters [!, @, #, $, %, ^, & or *]!");
+            throw new IllegalArgumentException("Invalid password given, password misses one of these special characters [!, @, #, $, %, ^, & or *]!");
+        }
+    }
 
     public String login(LoginDTO loginDTO){
         try{
@@ -85,7 +173,7 @@ public class UserService {
 
             return "Bearer " + jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
         }catch (AuthenticationException exception){
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "email/password invalid");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "email/password invalid");
         }
 
     }

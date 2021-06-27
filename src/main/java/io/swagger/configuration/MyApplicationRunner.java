@@ -39,8 +39,6 @@ public class MyApplicationRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        ////bank moet account hebben
-
         // Create users
         List<User> users =
                 Arrays.asList(
@@ -52,7 +50,6 @@ public class MyApplicationRunner implements ApplicationRunner {
                 );
         users.forEach(userService ::createUser);
 
-        // ALL ACCOUNTS ARE EUR ACCOUNTS
         // Create accounts
         List<Account> accounts =
                 Arrays.asList(
@@ -68,7 +65,7 @@ public class MyApplicationRunner implements ApplicationRunner {
         // Create transactions
         List<Transaction> transactions =
                 Arrays.asList(
-                        new Transaction(users.get(0).getId(), LocalDateTime.of(2018, 11, 15, 12, 00, 00), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(150), "water bill"),
+                        new Transaction(users.get(4).getId(), LocalDateTime.of(2018, 11, 15, 12, 00, 00), "NL58INHO0123456789", "NL58INHO0123456788", new BigDecimal(150), "water bill"),
                         new Transaction(users.get(1).getId(), LocalDateTime.of(2019, 10, 16, 12, 00, 00), "NL58INHO0123456788", "NL58INHO0123456701", new BigDecimal(230), "taxes"),
                         new Transaction(users.get(2).getId(), LocalDateTime.of(2020, 12, 28, 12, 00, 00), "NL58INHO0123456701", "NL58INHO0123456702", new BigDecimal(199), "electricity bill"),
                         new Transaction(users.get(3).getId(), LocalDateTime.of(2020, 12, 12, 12, 00, 00), "NL58INHO0123456702", "NL58INHO0123456701", new BigDecimal(500), "loan")
