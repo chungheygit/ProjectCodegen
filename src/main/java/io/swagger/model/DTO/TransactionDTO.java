@@ -12,13 +12,6 @@ public class TransactionDTO {
     private BigDecimal amount;
     private String description;
 
-    public TransactionDTO(String sender, String receiver, BigDecimal amount, String description) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.amount = amount;
-        this.description = description;
-    }
-
     public String getSender() {
         return sender;
     }

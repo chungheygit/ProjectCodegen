@@ -77,6 +77,15 @@ public class AccountService {
         return (List<Account>) accountRepository.getAccountByCreatedDate(date, offset, limit);
     }
 
+    public boolean getAccountByIbanUserAuthorized(String iban) throws Exception {
+        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+
     public Account createAccount(AccountDTO accountDTO) throws Exception {
 
         ModelMapper modelMapper = new ModelMapper();
@@ -208,12 +217,12 @@ public class AccountService {
     }
     //makes sure a customer can only retrieve his own accounts
     public Account getAccountByIbanWithSecurity(String iban) throws Exception {
-        if(!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)){
+        if (!userService.IsLoggedInUserEmployee() && !userService.IsIbanFromLoggedInUser(iban)) {
             throw new Exception("User not authorized");
-        }
-        else{
+        } else {
             return getAccountByIban(iban);
         }
+    }
 
     public boolean validIban(String iban) {
         Pattern pattern = Pattern.compile("NL\\d{2}INHO(\\d{10}|\\d{9})");

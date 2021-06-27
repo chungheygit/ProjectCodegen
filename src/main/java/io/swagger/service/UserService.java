@@ -160,16 +160,15 @@ public class UserService {
         }
     }
 
-    public String login(LoginDTO loginDTO) {
-        try {
+    public String login(LoginDTO loginDTO){
+        try{
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
 
             User user = userRepository.findUserByEmail(loginDTO.getEmail());
 
             return "Bearer " + jwtTokenProvider.createToken(user.getEmail(), Arrays.asList(user.getUserType()));
-        } catch (AuthenticationException exception) {
-            // 403: Unauthorized client error status response code indicates that the request has not been applied because it lacks valid authentication credentials for the target resource
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "email/password invalid");
+        }catch (AuthenticationException exception){
+            throw new EntityNotFoundException("email/password invalid");
         }
 
     }

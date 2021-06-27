@@ -46,22 +46,10 @@ Feature: Create transaction feature
     Then I get status 201 in CreateTransactionSteps
     And I get transaction with transactiontype withdrawal in CreateTransactionSteps
 
-  Scenario: Creating transaction to savings account from other user returns status 403 and message "Forbidden to transfer from/to savings account from another user."
+  Scenario: Creating transaction to savings account from other user returns status 400 and message "Forbidden to transfer from/to savings account from another user."
     When I log in with email "lio@test2.com" and password "password" for transaction
     And I create a transaction with sender "NL58INHO0123456788" and receiver "NL58INHO0000000089" and amount 10 and description "test"
-    Then I get status 403 in CreateTransactionSteps
-    And I get message containing "Forbidden to transfer from/to savings account from another user." in CreateTransactionSteps
-
-  Scenario: Creating transaction to savings account from other user returns status 403 and message "Forbidden to transfer from/to savings account from another user."
-    When I log in with email "lio@test2.com" and password "password" for transaction
-    And I create a transaction with sender "NL58INHO0123456788" and receiver "NL58INHO0000000089" and amount 10 and description "test"
-    Then I get status 403 in CreateTransactionSteps
-    And I get message containing "Forbidden to transfer from/to savings account from another user." in CreateTransactionSteps
-
-  Scenario: Creating transaction to savings account from other user returns status 403 and message "Forbidden to transfer from/to savings account from another user."
-    When I log in with email "lio@test2.com" and password "password" for transaction
-    And I create a transaction with sender "NL58INHO0123456788" and receiver "NL58INHO0000000089" and amount 10 and description "test"
-    Then I get status 403 in CreateTransactionSteps
+    Then I get status 400 in CreateTransactionSteps
     And I get message containing "Forbidden to transfer from/to savings account from another user." in CreateTransactionSteps
 
   Scenario: Creating transaction that hits absolute limit returns status 400 and message "Balance too low"

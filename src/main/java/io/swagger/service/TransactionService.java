@@ -58,6 +58,21 @@ public class TransactionService {
                 .orElseThrow(() -> new EntityNotFoundException("Transaction not found"));
     }
 
+    public boolean IsUserPerformingIsPermitted(String senderIban) throws Exception {
+        Account senderAccount = accountService.getAccountByIban(senderIban);
+        User senderUser = userRepository.getOne(senderAccount.getUserId());
+        User userPerforming = userService.findUserByEmail(myUserDetailsService.getLoggedInUser().getUsername());
+
+        //check if user is employee
+        if(!userService.IsLoggedInUserEmployee()){
+            //check if user is sender
+            if(!userPerforming.getId().equals(senderUser.getId())){
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     public void validateTransactionDTO(TransactionDTO transactionDTO){
         if(!accountService.validIban(transactionDTO.getSender())){
@@ -270,6 +285,13 @@ public class TransactionService {
             return transactionRepository.getAllTransactionsByLimitAndOffset(limit, offset);
         }
         return transactionRepository.getAllTransactionsByFilters(iban, convertToTimestamp(startDateTime), convertToTimestamp(endDateTime), limit, offset);
+    }
+
+    private void checkIfAmountIsLegit(double amount){
+        if(amount < 0.01){
+            log.error("User entered illegal amount value");
+            throw new IllegalArgumentException("Invalid amount");
+        }
     }
 
     public Timestamp convertToTimestamp(String date) throws Exception {

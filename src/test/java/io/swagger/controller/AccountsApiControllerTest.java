@@ -67,6 +67,7 @@ public class AccountsApiControllerTest {
         given(service.getAllAccounts()).willReturn(accounts);
         this.mvc.perform(get("/accounts/")).andExpect(
                 status().isOk());
+    }
 
     @Test
     @WithMockUser(roles = "Employee")

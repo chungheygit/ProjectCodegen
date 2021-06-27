@@ -24,11 +24,6 @@ public class LoginDTO {
   @JsonProperty("password")
   private String password = null;
 
-  public LoginDTO(String email, String password) {
-    this.email = email;
-    this.password = password;
-  }
-
   public LoginDTO email(String email) {
     this.email = email;
     return this;
