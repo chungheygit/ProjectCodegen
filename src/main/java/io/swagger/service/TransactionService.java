@@ -51,10 +51,12 @@ public class TransactionService {
 
     public void validateTransactionDTO(TransactionDTO transactionDTO){
         if(!accountService.validIban(transactionDTO.getSender())){
-            throw new IllegalArgumentException("Please enter a valid iban");
+            log.error("Invalid iban entered");
+            throw new IllegalArgumentException("Invalid iban entered");
         }
         if(!accountService.validIban(transactionDTO.getReceiver())){
-            throw new IllegalArgumentException("Please enter a valid iban");
+            log.error("Invalid iban entered");
+            throw new IllegalArgumentException("Invalid iban entered");
         }
         checkIfAmountIsLegit(transactionDTO.getAmount().doubleValue());
     }
