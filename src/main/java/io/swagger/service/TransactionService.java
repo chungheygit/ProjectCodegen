@@ -190,17 +190,6 @@ public class TransactionService {
         }
     }
 
-    public Boolean validateTransactionId(String transactionId) {
-        //mag niet negatief en moet integer zijn
-
-        try {
-            Integer intValue = Integer.parseInt(transactionId);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     public Boolean isTransactionFromLoggedInUser(Integer transactionid) {
         //getting the transaction
         Transaction transaction = getTransactionById(transactionid);
@@ -238,7 +227,6 @@ public class TransactionService {
             log.error("DateTime can not be greater than now!");
             throw new IllegalArgumentException("DateTime can not be greater than now. Try Again!");
         }
-
     }
     private void checkIfStartDateIsGreaterThanEndDate(String startDateTime, String endDateTime) throws Exception {
 

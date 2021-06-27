@@ -18,6 +18,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 public class GetTransactionsSteps {
     private HttpHeaders headers = new HttpHeaders();
@@ -78,15 +81,16 @@ public class GetTransactionsSteps {
     }
 
     @When("I get transactions by iban with StartDateTime {string}")
-    public void iGetTransactionsByIbanWithStartDateTime(String startDate) throws JSONException {
-//        Timestamp timestampExpected = convertToTimestamp(startDate);
-//        Timestamp timestampActual;
-//
-//        JSONArray jsonArray = new JSONArray(responseEntity.getBody());
-//        for (int i = 0; i < jsonArray.length(); i++) {
-//            timestampActual = Timestamp.valueOf(jsonArray.getJSONObject(i).getString("dateAndTime").replace('T', ' ').substring(0, 19));
-//            Assert.assertTrue(timestampActual.after(timestampExpected) || timestampActual.equals(timestampExpected));
-//        }
+    public void iGetTransactionsByIbanWithStartDateTime(String startDate) throws JSONException, ParseException {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Timestamp timestampExpected = new Timestamp(dateFormat.parse(startDate).getTime());
+        Timestamp timestampOfToday;
+
+        JSONArray jsonArray = new JSONArray(responseEntity.getBody());
+        for (int i = 0; i < jsonArray.length(); i++) {
+            timestampOfToday = Timestamp.valueOf(jsonArray.getJSONObject(i).getString("startDateTime").replace('T', ' ').substring(0, 19));
+            Assert.assertTrue(timestampOfToday.after(timestampExpected) || timestampOfToday.equals(timestampExpected));
+        }
     }
 
     @And("I get array of transactions by iban after {string}")
@@ -94,7 +98,16 @@ public class GetTransactionsSteps {
     }
 
     @When("I get transactions by iban with EndDateTime {string}")
-    public void iGetTransactionsByIbanWithEndDateTime(String arg0) {
+    public void iGetTransactionsByIbanWithEndDateTime(String endDate) throws JSONException, ParseException {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Timestamp timestampExpected = new Timestamp(dateFormat.parse(endDate).getTime());
+        Timestamp timestampOfToday;
+
+        JSONArray jsonArray = new JSONArray(responseEntity.getBody());
+        for (int i = 0; i < jsonArray.length(); i++) {
+            timestampOfToday = Timestamp.valueOf(jsonArray.getJSONObject(i).getString("dateAndTime").replace('T', ' ').substring(0, 19));
+            Assert.assertTrue(timestampOfToday.before(timestampExpected) || timestampOfToday.equals(timestampExpected));
+        }
     }
 
     @And("I get array of transactions by iban before {string}")

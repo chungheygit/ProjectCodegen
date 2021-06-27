@@ -61,7 +61,6 @@ public class UserService {
         return userRepository
             .findById(id)
                 .orElseThrow(() ->  new EntityNotFoundException("User not found"));
-
     }
 
     // Get all users by mail
@@ -114,9 +113,6 @@ public class UserService {
             log.error("Invalid DateOfBirth given, Date must be in the past!");
             throw new IllegalArgumentException("Invalid DateOfBirth given, Date must be in the past!.");
         }
-
-        //checks enum
-        //if(targetUser.getUserTypeEnum().fromValue(UserType))
 
         //transactionlimit and daylimit can not be negative
         if(targetUser.getTransactionLimit().compareTo(BigDecimal.ZERO) < 0 || targetUser.getDayLimit().compareTo(BigDecimal.ZERO) < 0){
