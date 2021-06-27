@@ -15,8 +15,8 @@ public interface UserRepository extends JpaRepository <User, Long> {
     @Query("SELECT u FROM User u WHERE u.email =:email")
     User findUserByEmail(@Param("email") String email);
 
-    @Query(value = "SELECT * FROM User WHERE email =?1 limit ?3 offset ?2" , nativeQuery = true)
-    List<User> getUsersByFilters(String email, Integer limit, Integer offset);
+    @Query(value = "SELECT * FROM User WHERE id = id limit :limit offset :offset" , nativeQuery = true)
+    List<User> getUsersByFilters(Integer limit, Integer offset);
 
 
 }

@@ -19,6 +19,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
@@ -43,7 +44,6 @@ public class UsersApiController implements UsersApi {
     private final AccountService accountService;
 
 
-
     @org.springframework.beans.factory.annotation.Autowired
     public UsersApiController(ObjectMapper objectMapper, HttpServletRequest request, UserService userService, AccountService accountService) {
         this.objectMapper = objectMapper;
@@ -53,61 +53,65 @@ public class UsersApiController implements UsersApi {
     }
 
     // CREATE A NEW USER
-   // @PreAuthorize("hasRole('EMPLOYEE')")
-    public ResponseEntity<User> createUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody User body) {
-        String accept = request.getHeader("Accept");
+    // Access will only be allowed for users with the role "ROLE_EMPLOYEE"
+    @PreAuthorize("hasRole('Employee')")
+    public ResponseEntity<User> createUser(
+            @Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema())
+            @Valid
+            @RequestBody User body) {
         //Create User
-        try {
-            if(!userService.IsLoggedInUserEmployee()) {
-                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
-            }
-            return new ResponseEntity<User>(userService.createUser(body),HttpStatus.OK);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (!body.getEmail().matches("^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$")) {
+            //(FORBIDDEN) A 403 - Invalid format A validation error is an error due to invalid client requests. (Endpoint validation rules are not matched  - e.g. regex constraint doesn't match)
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid email");
+        }else if (userService.findUserByEmail(body.getEmail()) != null) {
+            // (FORBIDDEN) A 403  - Already Exists error indicates that it is not possible to create a resource with the given definition because another resource already exists with the same attributes
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "User already exists with email");
         }
+            return new ResponseEntity<User>(userService.createUser(body),HttpStatus.CREATED);
     }
 
     // GET ALL USERS
-    public ResponseEntity<List<User>> getAllUsers(@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "offset", required = false) Integer offset,@Min(0)@Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }
-)) @Valid @RequestParam(value = "limit", required = false) Integer limit,@Parameter(in = ParameterIn.QUERY, description = "filter users by email" ,schema=@Schema()) @Valid @RequestParam(value = "email", required = false) String email) throws Exception {
-        String accept = request.getHeader("Accept");
-
-        List<User> users = new ArrayList<User>();
+    // Access will only be allowed for users with the role "ROLE_EMPLOYEE"
+    @PreAuthorize("hasRole('Employee')")
+    public ResponseEntity<List<User>> getAllUsers(
+            @Min(0)
+            @Parameter(in = ParameterIn.QUERY, description = "The number of items to skip before starting to \\ collect the result set" ,schema=@Schema(allowableValues={  }))
+            @Valid
+            @RequestParam(value = "offset", required = false) Integer offset,
+            @Min(0)
+            @Parameter(in = ParameterIn.QUERY, description = "The numbers of items to return" ,schema=@Schema(allowableValues={  }))
+            @Valid
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @Parameter(in = ParameterIn.QUERY, description = "filter users by email" ,schema=@Schema())
+            @Valid
+            @RequestParam(value = "email", required = false) String email) throws Exception {
         try {
-
-            // GET ALL USERS BY MAIL
             if (email != null) {
-                User u = userService.findUserByEmail(email);
-                //users = new ArrayList<User>();
-                if(!userService.IsLoggedInUserEmployee()) {
-                    return new ResponseEntity<List<User>>(HttpStatus.UNAUTHORIZED);
-                }
-                if (u == null)
+                //Get user by email
+                User user = userService.findUserByEmail(email);
+                List <User> users = new ArrayList<User>();
+                // If there is no user with this email then..
+                if (user == null)
+                    // (NOTACCEPTABLE) 406: 406 Not Acceptable client error response code indicates that the server cannot produce a response matching the list of acceptable values defined in the request's proactive content negotiation headers
                     return new ResponseEntity(HttpStatus.NOT_ACCEPTABLE);
-                users.add(u);
+                users.add(user);
                 return new ResponseEntity<List<User>>(users, HttpStatus.OK);
             }
-            //RETURN USERS WITH OR WITHOUT LIMIT AND OFFSET
             return new ResponseEntity<List<User>>(userService.getAllUsers(limit, offset), HttpStatus.OK);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (ResponseStatusException iae) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
     // GET A USER BY ITS ID
-    public ResponseEntity<User> getUserById(@Min(0)@Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }
-)) @PathVariable("userId") Integer userId) {
-        String accept = request.getHeader("Accept");
+    // Access will only be allowed for users with the role "ROLE_EMPLOYEE"
+    @PreAuthorize("hasRole('Employee')")
+    public ResponseEntity<User> getUserById(
+            @Min(0)
+            @Parameter(in = ParameterIn.PATH, description = "Id of a user", required=true, schema=@Schema(allowableValues={  }))
+            @PathVariable("userId") Integer userId) throws NotFoundException {
         //Get user by id
-        try {
-            if(!userService.IsLoggedInUserEmployee()) {
-                return new ResponseEntity<User>(HttpStatus.UNAUTHORIZED);
-            }
-            return new ResponseEntity<User>(userService.getUserById(userId),HttpStatus.OK);
-        } catch (IllegalArgumentException iae) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+        return new ResponseEntity<User>(userService.getUserById(userId),HttpStatus.OK);
     }
 
     public ResponseEntity<String> loginUser(@Parameter(in = ParameterIn.DEFAULT, description = "", required=true, schema=@Schema()) @Valid @RequestBody LoginDTO body) {
